@@ -365,3 +365,62 @@ button { cursor: pointer; }
   gap: 6px;
   margin-bottom: 10px;
 }
+/* Исправление обрезки на ПК для первой карточки */
+.sf-card.sf-check-card {
+  overflow: visible;
+}
+
+/* Блок "Как это работает" */
+.sf-how-section {
+  margin: 40px 2% 20px;
+  padding: 30px;
+  background: rgba(255, 255, 255, 0.95);
+  border-radius: 20px;
+  box-shadow: 0 4px 12px rgba(23, 52, 91, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.9);
+}
+
+.sf-how-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 20px;
+}
+
+.sf-how-step {
+  background: #F8FAFC;
+  padding: 20px;
+  border-radius: 15px;
+  border: 1px solid #EAF3FF;
+  text-align: center;
+}
+
+.sf-how-number {
+  width: 40px;
+  height: 40px;
+  background: var(--blue);
+  color: white;
+  font-size: 20px;
+  font-weight: 900;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 15px;
+}
+
+.sf-how-step h3 {
+  font-size: 16px;
+  color: var(--navy);
+  margin-bottom: 10px;
+  font-weight: 800;
+}
+
+.sf-how-step p {
+  font-size: 13px;
+  color: #526782;
+  line-height: 1.4;
+}
+
+@media (max-width: 900px) {
+  .sf-how-grid { grid-template-columns: 1fr; }
+}
