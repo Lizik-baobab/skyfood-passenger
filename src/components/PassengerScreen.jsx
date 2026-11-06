@@ -87,12 +87,10 @@ export default function PassengerScreen() {
     <div className="skyfood-page">
       {/* ШАПКА */}
       <header className="sf-header">
-        {/* Исправленный логотип без пробела */}
         <a href="#hero" className="sf-logo">
           <span className="sf-logo-icon">✈</span>
           <span>Sky<span style={{ color: 'var(--blue)' }}>Food</span></span>
         </a>
-        
         <nav className="sf-nav">
           <a href="#hero">Главная</a>
           <a href="#how">Как это работает</a>
@@ -114,13 +112,10 @@ export default function PassengerScreen() {
             <div className="sf-hero-brand">SkyFood —</div>
             <h1>вкусное решение<br />при задержке рейса<span className="sf-heart">♡</span></h1>
             <p>Получите ваучер на воду или питание<br />и наслаждайтесь едой в аэропорту</p>
-            
-            {/* Увеличенная кнопка */}
             <button className="sf-primary-button" onClick={scrollToCheck}>
               <span className="sf-primary-text">Проверить ваучер</span>
               <IconArrow />
             </button>
-
           </div>
           <div className="sf-plane-decoration">✈</div>
         </section>
