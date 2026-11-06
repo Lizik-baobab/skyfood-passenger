@@ -108,7 +108,7 @@ export default function PassengerScreen() {
             <div className="sf-card-heading"><span className="sf-heading-icon"><IconSearch /></span><h2>Проверить ваучер</h2></div>
             <p className="sf-card-description">Введите код посадочного талона, чтобы проверить наличие ваучера SkyFood.</p>
             <form onSubmit={handleCheck} className="sf-check-form">
-              <input type="text" value={ticket} onChange={(e) => setTicket(e.target.value)} placeholder="Код посадочного талона" />
+              <input type="text" value={ticket} onChange={(e) => setTicket(e.target.value)} placeholder="Код посадочного талона (латиницей, напр. TK-849201)"  />
               <button type="submit" disabled={loading}>{loading ? 'Проверяем...' : 'Проверить'}</button>
             </form>
             
