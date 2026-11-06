@@ -431,3 +431,15 @@ button { cursor: pointer; }
   .sf-benefit p { font-size: 13px; }
   .sf-benefits-plane { display: none; }
 }
+/* ИСПРАВЛЕНИЕ ДЛЯ ПК */
+@media (min-width: 901px) {
+  .sf-main-cards {
+    grid-template-columns: 1.32fr 0.95fr 0.83fr; /* Возвращаем правильные пропорции */
+    align-items: stretch; /* Растягиваем карточки по высоте */
+  }
+  
+  .sf-card {
+    height: 210px; /* Фиксируем высоту, чтобы они не прыгали */
+    min-height: 210px;
+  }
+}
