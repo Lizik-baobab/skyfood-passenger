@@ -183,18 +183,45 @@ button { cursor: pointer; }
 }
 
 @media (max-width: 768px) {
-  /* Возвращаем шапку на мобильные */
+  /* Глобальные правила для мобильных */
+  .skyfood-page { padding: 0; overflow-x: hidden; }
+  .sf-card, .sf-info-section, .sf-how-section { width: 100%; max-width: 100%; box-sizing: border-box; padding: 20px; margin: 15px 0; border-radius: 0; }
+  
+  /* Шапка */
   .sf-header { padding: 15px 20px; flex-direction: column; gap: 15px; background: #fff; border-bottom: 1px solid #EAF3FF; }
   .sf-nav { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; background: transparent; box-shadow: none; padding: 0; }
   .sf-nav a { font-size: 12px; background: #EAF3FF; padding: 6px 12px; border-radius: 15px; }
 
-  .skyfood-page { padding: 0; }
-  .sf-hero { border-radius: 0; margin: 0; }
+  /* Главный экран */
+  .sf-hero { border-radius: 0; margin: 0; height: auto; }
   .sf-hero h1 { font-size: 28px; }
-  .sf-main-cards { padding: 20px; }
-  .sf-info-section, .sf-how-section { margin: 20px 15px; padding: 20px; }
+  .sf-hero-content { padding: 30px 20px; }
+  .sf-primary-button { width: 100%; max-width: 100%; }
+
+  /* Форма */
+  .sf-check-form { flex-direction: column; width: 100%; }
+  .sf-check-form input, .sf-check-form button { width: 100%; }
+
+  /* Подсказка */
+  .sf-hint-container { flex-direction: column; align-items: stretch; padding: 15px; }
+  .sf-hint-left { flex-direction: column; align-items: flex-start; gap: 15px; }
+  .sf-hint-code { align-items: flex-start; }
+  .sf-hint-right { width: 100%; }
+  
+  /* Типы ваучеров */
+  .sf-types { grid-template-columns: 1fr; gap: 15px; }
+
+  /* Кафе */
+  .sf-filter-bar { flex-direction: column; align-items: stretch; gap: 10px; }
+  .sf-filter-count { margin-left: 0; text-align: right; }
   .sf-cafes-grid-new { grid-template-columns: 1fr; }
-  .sf-check-form { flex-direction: column; }
-  .sf-hint-container { flex-direction: column; align-items: flex-start; }
-  .sf-hint-left { width: 100%; justify-content: space-between; }
+  .sf-cafe-new-card { width: 100%; }
+
+  /* Контакты и футер */
+  .sf-contacts-grid { grid-template-columns: 1fr; gap: 15px; }
+  .sf-footer-bar { flex-direction: column; gap: 15px; text-align: center; }
+  .sf-footer-right { flex-direction: column; gap: 10px; }
+
+  /* Правила */
+  .sf-info-grid { grid-template-columns: 1fr; }
 }
