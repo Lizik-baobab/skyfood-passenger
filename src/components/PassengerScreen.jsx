@@ -73,14 +73,10 @@ export default function PassengerScreen() {
       const result = await checkTicket(code);
       setData(result);
     } catch (err) {
-      setError(err?.message || 'Не удалось проверить ваучер. Попробуйте ещё раз.');
+      setError(err?.message || 'Не удалось проверить ваучер. Попробуйте ещё раз позднее.');
     } finally {
       setLoading(false);
     }
-  };
-
-  const scrollToCheck = () => {
-    document.getElementById('check-section')?.scrollIntoView({ behavior: 'smooth', block: 'center' });
   };
 
   return (
@@ -95,9 +91,9 @@ export default function PassengerScreen() {
           <a href="#hero">Главная</a>
           <a href="#how">Как это работает</a>
           <a href="#check-section">Проверить ваучер</a>
-          <a href="#cafes">Кафе-партнёры</a>
+          <a href="#cafes-list">Кафе-партнёры</a>
           <a href="#rules">Правила использования</a>
-          <a href="#check-section" style={{ fontWeight: '900', color: 'var(--navy)' }}>Контакты</a>
+          <a href="#contacts" style={{ fontWeight: '900', color: 'var(--navy)' }}>Контакты</a>
         </nav>
       </header>
 
@@ -112,7 +108,7 @@ export default function PassengerScreen() {
             <div className="sf-hero-brand">SkyFood —</div>
             <h1>вкусное решение<br />при задержке рейса<span className="sf-heart">♡</span></h1>
             <p>Получите ваучер на воду или питание<br />и наслаждайтесь едой в аэропорту</p>
-            <button className="sf-primary-button" onClick={scrollToCheck}>
+            <button className="sf-primary-button" onClick={() => document.getElementById('check-section')?.scrollIntoView({ behavior: 'smooth' })}>
               <span className="sf-primary-text">Проверить ваучер</span>
               <IconArrow />
             </button>
@@ -121,21 +117,87 @@ export default function PassengerScreen() {
         </section>
 
         {/* ТРИ КАРТОЧКИ */}
-        <section className="sf-main-cards">
+        <section className="sf-main-cards" id="how">
           {/* Проверка ваучера */}
           <article className="sf-card sf-check-card" id="check-section">
             <div className="sf-card-heading">
               <span className="sf-heading-icon"><IconSearch /></span>
               <h2>Проверить ваучер</h2>
             </div>
-            <p className="sf-card-description">Введите код посадочного талона,<br />чтобы проверить наличие ваучера SkyFood.</p>
+            <p className="sf-card-description">Введите код посадочного талона, чтобы проверить наличие ваучера SkyFood.</p>
             <form onSubmit={handleCheck} className="sf-check-form">
               <input type="text" value={ticket} onChange={(e) => setTicket(e.target.value)} placeholder="Код посадочного талона" />
               <button type="submit" disabled={loading}>{loading ? 'Проверяем...' : 'Проверить'}</button>
             </form>
-            {error && <div className="sf-error">{error}</div>}
-            {data && <div className="sf-result"><strong>Результат:</strong><pre>{JSON.stringify(data, null, 2)}</pre></div>}
-            <div className="sf-card-hint"><span>ⓘ</span> Где найти код? Посмотрите на посадочный талон.</div>
+            
+            {error && (
+              <div className="sf-error-message">
+                <strong>{error}</strong>
+              </div>
+            )}
+            
+            {data && (
+              <>
+                {data.status === 'Активен' && (
+                  <div className="sf-voucher-card">
+                    <div className="sf-voucher-header">
+                      <span>Ваш ваучер SkyFood</span>
+                      <span className="sf-voucher-status">{data.status}</span>
+                    </div>
+                    <div className="sf-voucher-row"><span>Пассажир:</span> <strong>{data.passengerName}</strong></div>
+                    <div className="sf-voucher-row"><span>Тип ваучера:</span> <strong>{data.voucherType}</strong></div>
+                    <div className="sf-voucher-row"><span>Сумма периода:</span> <strong>{data.totalAmount} RUB</strong></div>
+                    <div className="sf-voucher-balance">Остаток: <strong>{data.balance} RUB</strong></div>
+                    <p className="sf-voucher-instruction">Предъявите посадочный талон сотруднику участвующего в программе кафе.</p>
+                  </div>
+                )}
+                
+                {data.status === 'Не выдан' && (
+                  <div className="sf-info-message">
+                    <strong>Ваучер пока недоступен</strong>
+                    <p>По вашему посадочному талону пока нет доступного ваучера SkyFood. Если ваш рейс задержан, проверьте информацию позднее.</p>
+                  </div>
+                )}
+
+                {data.status === 'Закрыт' && (
+                  <div className="sf-error-message">
+                    <strong>Ваучер больше не действует</strong>
+                    <p>Ваучер закрыт. Его использование для новых покупок недоступно.</p>
+                  </div>
+                )}
+              </>
+            )}
+
+            <div className="sf-card-hint">
+             <div className="sf-hint-header">
+                <span>ⓘ</span> Где найти код? Посмотрите на посадочный талон:
+              </div>
+              
+              {/* Мини-билет */}
+              <div className="sf-mini-ticket">
+                <div className="sf-mini-ticket-header">
+                  <span>ПОСАДОЧНЫЙ ТАЛОН</span>
+                  <span>✈</span>
+                </div>
+                <div className="sf-mini-ticket-route">
+                  <span>SVO</span>
+                  <svg width="30" height="10" viewBox="0 0 30 10"><path d="M0 5 L25 5 M20 2 L25 5 L20 8" stroke="#2364B5" strokeWidth="1.5" fill="none"/></svg>
+                  <span>AER</span>
+                </div>
+                <div className="sf-mini-ticket-code">
+                  <span className="sf-mini-ticket-label">Код бронирования:</span>
+                  <span className="sf-mini-ticket-highlight">TK-849201</span>
+                </div>
+              </div>
+              
+              <p style={{ marginTop: '10px', fontSize: '10px' }}>
+                <strong>Тестовые коды:</strong><br/>
+                TK-849201 (активен)<br/>
+                TK-000001 (не выдан)<br/>
+                TK-999999 (закрыт)
+              </p>
+            </div>
+
             <div className="sf-ticket-decoration">
               <div className="sf-ticket-top">✈</div>
               <div className="sf-ticket-lines"></div>
@@ -143,7 +205,7 @@ export default function PassengerScreen() {
           </article>
 
           {/* Типы ваучеров */}
-          <article className="sf-card sf-types-card" id="how">
+          <article className="sf-card sf-types-card">
             <div className="sf-card-heading">
               <span className="sf-heading-icon"><IconTicket /></span>
               <h2>Типы ваучеров</h2>
@@ -153,20 +215,20 @@ export default function PassengerScreen() {
                 <div className="sf-type-icon sf-water"><IconWater /></div>
                 <div>
                   <strong>WATER</strong>
-                  <p>Ваучер на воду.<br />Предоставляется<br />при задержке рейса.</p>
+                  <p>Ваучер на воду. Предоставляется после достижения установленного порога задержки.</p>
                 </div>
               </div>
               <div className="sf-type">
                 <div className="sf-type-icon sf-meal"><IconMeal /></div>
                 <div>
                   <strong>MEAL</strong>
-                  <p>Ваучер на питание.<br />Предоставляется<br />при более длительной<br />задержке.</p>
+                  <p>Ваучер на питание. Предоставляется при более длительной задержке.</p>
                 </div>
               </div>
             </div>
             <div className="sf-types-note">
               <span><IconRefresh /></span>
-              Возможно пополнение ваучера<br />при продолжительной задержке.
+              Возможно пополнение ваучера при продолжительной задержке.
             </div>
           </article>
 
@@ -177,8 +239,8 @@ export default function PassengerScreen() {
                 <span className="sf-heading-icon"><IconPin /></span>
                 <h2>Где воспользоваться ваучером</h2>
               </div>
-              <p>Список кафе-партнёров<br />в аэропорту</p>
-              <a href="#rules" className="sf-cafe-button">
+              <p>Список кафе-партнёров в аэропорту</p>
+              <a href="#cafes-list" className="sf-cafe-button">
                 Посмотреть кафе <IconArrow />
               </a>
             </div>
@@ -188,8 +250,82 @@ export default function PassengerScreen() {
           </article>
         </section>
 
-        {/* ПРЕИМУЩЕСТВА */}
-        <section className="sf-benefits" id="rules">
+        {/* КАФЕ-ПАРТНЁРЫ (СПИСОК) */}
+        <section className="sf-info-section" id="cafes-list">
+          <h2 className="sf-info-title">Кафе-партнёры</h2>
+          <div className="sf-cafe-list">
+            <div className="sf-cafe-list-item">
+              <h3>SkyCafe</h3>
+              <p>Аэропорт Шереметьево (SVO), Терминал B, 2 этаж, сектор 3</p>
+              <p><strong>Телефон:</strong> +7 (495) 123-45-67</p>
+              <p><strong>Доступные ваучеры:</strong> WATER, MEAL</p>
+            </div>
+            <div className="sf-cafe-list-item">
+              <h3>Coffee Point</h3>
+              <p>Аэропорт Домодедово (DME), Терминал 1, 1 этаж, зона вылета</p>
+              <p><strong>Доступные ваучеры:</strong> WATER</p>
+            </div>
+            <div className="sf-cafe-list-item">
+              <h3>Bistro & Bar</h3>
+              <p>Аэропорт Пулково (LED), Терминал 1, 3 этаж, сектор A</p>
+              <p><strong>Телефон:</strong> +7 (812) 765-43-21</p>
+              <p><strong>Доступные ваучеры:</strong> MEAL</p>
+            </div>
+          </div>
+        </section>
+
+        {/* ПРАВИЛА ИСПОЛЬЗОВАНИЯ */}
+        <section className="sf-info-section" id="rules">
+          <h2 className="sf-info-title">Правила использования</h2>
+          <div className="sf-info-grid">
+            <div className="sf-info-item">
+              <strong>1. Условия предоставления</strong>
+              <p>Ваучер предоставляется пассажирам при задержке рейса, если авиакомпания участвует в программе SkyFood.</p>
+            </div>
+            <div className="sf-info-item">
+              <strong>2. Виды ваучеров</strong>
+              <p>WATER — для покупки воды. MEAL — для приобретения разрешённых продуктов питания и напитков.</p>
+            </div>
+            <div className="sf-info-item">
+              <strong>3. Чем отличаются</strong>
+              <p>WATER предоставляется при меньшем времени задержки, MEAL — при более длительном ожидании.</p>
+            </div>
+            <div className="sf-info-item">
+              <strong>4. Как проверить</strong>
+              <p>Введите код посадочного талона в разделе «Проверить ваучер» на этой странице.</p>
+            </div>
+            <div className="sf-info-item">
+              <strong>5. Как воспользоваться</strong>
+              <p>Предъявите посадочный талон сотруднику кафе. Он спишет нужную сумму с ваучера.</p>
+            </div>
+            <div className="sf-info-item">
+              <strong>6. Можно ли использовать несколько раз</strong>
+              <p>Да, ваучер можно использовать до тех пор, пока на нем есть остаток средств.</p>
+            </div>
+            <div className="sf-info-item">
+              <strong>7. Когда ваучер закрывается</strong>
+              <p>Ваучер перестаёт действовать при начале посадки, отмене или вылете рейса.</p>
+            </div>
+            <div className="sf-info-item">
+              <strong>8. Что можно купить</strong>
+              <p>Разрешённые продукты и напитки. Спиртные напитки и табачные изделия приобрести нельзя.</p>
+            </div>
+          </div>
+          <p className="sf-info-footer">Размер ваучера и список разрешённых товаров зависят от авиакомпании. После закрытия ваучера новые покупки невозможны.</p>
+        </section>
+
+        {/* КОНТАКТЫ */}
+        <section className="sf-contacts-section" id="contacts">
+          <h2 className="sf-info-title">Контактная информация</h2>
+          <p>Если у вас возникли вопросы по программе лояльности, свяжитесь с нами:</p>
+          <div className="sf-contacts-list">
+            <div>📧 Email: <a href="mailto:support@skyfood.ru">support@skyfood.ru</a></div>
+            <div>📞 Телефон: <a href="tel:88005553535">8 (800) 555-35-35</a></div>
+          </div>
+        </section>
+
+        {/* ПРЕИМУЩЕСТВА (ПОДВАЛ) */}
+        <footer className="sf-benefits">
           <div className="sf-benefit">
             <span><IconShield /></span>
             <p>Удобно<br />и быстро</p>
@@ -202,15 +338,10 @@ export default function PassengerScreen() {
             <span><IconHeart /></span>
             <p>Забота о пассажирах</p>
           </div>
-          <div className="sf-benefits-plane">
-            <svg width="380" height="70" viewBox="0 0 380 70" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <path d="M 10 50 Q 120 10, 220 40 T 340 20" stroke="#4386D0" strokeWidth="2" strokeDasharray="6 6" strokeOpacity="0.4" fill="none" />
-              <g transform="translate(330, 5) rotate(15)">
-                <path d="M21 16v-2l-8-5V3.5c0-.83-.67-1.5-1.5-1.5S10 2.67 10 3.5V9l-8 5v2l8-2.5V19l-2 1.5V22l3.5-1 3.5 1v-1.5L13 19v-5.5l8 2.5z" fill="#4386D0" />
-              </g>
-            </svg>
+          <div className="sf-benefits-copyright">
+            © 2026 SkyFood. Все права защищены.
           </div>
-        </section>
+        </footer>
       </main>
     </div>
   );

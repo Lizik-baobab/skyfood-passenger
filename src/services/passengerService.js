@@ -1,16 +1,38 @@
-import { STATUS } from '../constants/flights';
-
-const MOCK_DB = {
-  'TK-849201': { flightNumber: 'SU1234', status: STATUS.DELAYED, voucherAmount: 500, balance: 500 },
-  '1234567890': { flightNumber: 'SU1550', status: STATUS.SCHEDULED, voucherAmount: 0, balance: 0 },
-  '5555555555': { flightNumber: 'SU2045', status: STATUS.DELAYED, voucherAmount: 800, balance: 800 },
+const MOCK_DATA = {
+  'TK-849201': {
+    passengerName: 'Иванов Иван Иванович',
+    voucherType: 'MEAL',
+    totalAmount: 1000,
+    balance: 750,
+    status: 'Активен',
+    currency: 'RUB',
+  },
+  'TK-000001': {
+    passengerName: 'Петров Петр Петрович',
+    voucherType: 'WATER',
+    totalAmount: 0,
+    balance: 0,
+    status: 'Не выдан',
+    currency: 'RUB',
+  },
+  'TK-999999': {
+    passengerName: 'Сидоров Сидор Сидорович',
+    voucherType: 'MEAL',
+    totalAmount: 1000,
+    balance: 0,
+    status: 'Закрыт',
+    currency: 'RUB',
+  },
 };
 
-const wait = (ms) => new Promise((r) => setTimeout(r, ms));
-
 export async function checkTicket(ticketNumber) {
-  await wait(600);
-  const data = MOCK_DB[ticketNumber];
-  if (!data) throw new Error('Билет не найден. Проверьте номер.');
-  return { ...data };
+  await new Promise((resolve) => setTimeout(resolve, 800));
+
+  const data = MOCK_DATA[ticketNumber];
+
+  if (!data) {
+    throw new Error('Посадочный талон не найден. Проверьте правильность введённого кода.');
+  }
+
+  return data;
 }
