@@ -286,8 +286,8 @@ export default function PassengerScreen() {
           </div>
         </section>
 
-                {/* КОНТАКТЫ И ФУТЕР (ОБЪЕДИНЕНЫ) */}
-        <section className="sf-footer-section" id="contacts">
+                {/* КОНТАКТЫ И ФУТЕР */}
+        <section className="sf-info-section" id="contacts">
           <div className="sf-contacts-grid">
             <div>
               <h2 className="sf-info-title">Контакты</h2>
