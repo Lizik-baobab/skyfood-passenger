@@ -225,3 +225,32 @@ button { cursor: pointer; }
   /* Правила */
   .sf-info-grid { grid-template-columns: 1fr; }
 }
+/* ================= ИСПРАВЛЕНИЯ ДЛЯ МОБИЛЬНЫХ ================= */
+@media (max-width: 768px) {
+  /* 1. Увеличиваем поле ввода, чтобы было удобно тыкать */
+  .sf-check-form input {
+    height: 55px;
+    font-size: 16px; /* 16px предотвращает зум на iPhone */
+    padding: 0 20px;
+  }
+  .sf-check-form button {
+    height: 55px;
+    font-size: 16px;
+  }
+
+  /* 2. Исправляем растянутый селектор города */
+  .sf-filter-select {
+    width: 100%; /* Растягиваем только контейнер */
+    justify-content: space-between;
+  }
+  .sf-filter-select select {
+    width: auto; /* Сам селектор не растягиваем */
+    flex: 1; /* Но даем ему занять доступное место */
+    font-size: 16px;
+  }
+
+  /* 3. Общие отступы для мобильных, чтобы ничего не обрезалось */
+  .sf-hint-container { padding: 15px; }
+  .sf-hint-value { font-size: 20px; } /* Увеличиваем код талона в подсказке */
+  .sf-mini-ticket-ui { width: 100%; } /* Талон на всю ширину */
+}

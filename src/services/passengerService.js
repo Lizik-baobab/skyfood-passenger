@@ -1,5 +1,5 @@
 const MOCK_DATA = {
-  'TK-849201': {
+  '555-1234567890': {
     passengerName: 'Иванов Иван Иванович',
     voucherType: 'MEAL',
     totalAmount: 1000,
@@ -7,7 +7,7 @@ const MOCK_DATA = {
     status: 'Активен',
     currency: 'RUB',
   },
-  'TK-000001': {
+  '555-0000000001': {
     passengerName: 'Петров Петр Петрович',
     voucherType: 'WATER',
     totalAmount: 0,
@@ -15,7 +15,7 @@ const MOCK_DATA = {
     status: 'Не выдан',
     currency: 'RUB',
   },
-  'TK-999999': {
+  '555-9999999999': {
     passengerName: 'Сидоров Сидор Сидорович',
     voucherType: 'MEAL',
     totalAmount: 1000,

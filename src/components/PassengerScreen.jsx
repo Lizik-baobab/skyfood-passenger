@@ -109,18 +109,7 @@ export default function PassengerScreen() {
             </div>
 
             <form onSubmit={handleCheck} className="sf-check-form">
-              <input 
-  type="text" 
-  value={ticket} 
-  onChange={(e) => {
-    setTicket(e.target.value);
-    if (e.target.value === '') {
-      setData(null);
-      setError('');
-    }
-  }} 
-  placeholder="Код талона" 
-/>
+<input type="text" value={ticket} onChange={(e) => setTicket(e.target.value)} placeholder="Номер билета (13 цифр)" />
               <button type="submit" disabled={loading}>{loading ? 'Проверяем...' : 'Проверить'}</button>
             </form>
             
@@ -166,7 +155,7 @@ export default function PassengerScreen() {
               </>
             )}
 
-            <div className="sf-hint-container">
+                       <div className="sf-hint-container">
               <div className="sf-hint-left">
                 <div className="sf-mini-ticket-ui">
                   <div className="sf-mt-top"><span>BOARDING PASS</span><span>✈</span></div>
@@ -175,21 +164,21 @@ export default function PassengerScreen() {
                 </div>
                 
                 <div className="sf-hint-code">
-                  <span className="sf-hint-label">КОД ТАЛОНА</span>
-                  <span className="sf-hint-value">TK-XXXXXX</span>
+                  <span className="sf-hint-label">НОМЕР БИЛЕТА</span>
+                  <span className="sf-hint-value">555-1234567890</span>
                   <div className="sf-barcode"></div>
                 </div>
               </div>
 
               <div className="sf-hint-right">
-                <h4>Где найти код?</h4>
-                <p>Введите 6 символов с талона — как в выделенной части образца.</p>
-                <p className="sf-hint-example"><IconTicket /> Пример: TK-849201 - латиницей</p>
+                <h4>Где найти номер?</h4>
+                <p>Введите 13-значный номер билета, указанный на вашем посадочном талоне или в электронном билете.</p>
+                <p className="sf-hint-example"><IconTicket /> Пример: 555-1234567890</p>
                 <div className="sf-test-codes">
-                  <strong>Тестовые коды (латиницей):</strong>
-                  <span>TK-849201 (активен)</span>
-                  <span>TK-000001 (не выдан)</span>
-                  <span>TK-999999 (закрыт)</span>
+                  <strong>Тестовые номера:</strong>
+                  <span>555-1234567890 (активен)</span>
+                  <span>555-0000000001 (не выдан)</span>
+                  <span>555-9999999999 (закрыт)</span>
                 </div>
               </div>
             </div>
@@ -250,9 +239,7 @@ export default function PassengerScreen() {
               </div>
             ))}
           </div>
-          <div className="sf-info-footer" style={{ marginTop: '20px' }}>
-            ⓘ Кафе и расположение показаны для примера. Доступные точки будут указаны после проверки ваучера.
-          </div>
+      
         </section>
 
         {/* КАК ЭТО РАБОТАЕТ */}
