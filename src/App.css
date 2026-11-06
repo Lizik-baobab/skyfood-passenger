@@ -1,0 +1,23 @@
+
+/* Основные настройки приложения */
+
+#root {
+  width: 100%;
+  min-height: 100vh;
+  margin: 0;
+  padding: 0;
+  max-width: none;
+  text-align: left;
+}
+
+/* Убираем стандартные стили Vite */
+
+.counter,
+.hero,
+#center,
+#next-steps,
+#docs,
+#spacer,
+.ticks {
+  all: unset;
+}
