@@ -45,6 +45,7 @@ export default function PassengerScreen() {
   const [error, setError] = useState('');
   const [selectedCity, setSelectedCity] = useState('Москва');
   const [selectedAirport, setSelectedAirport] = useState('SVO');
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   const handleCheck = async (e) => {
     e.preventDefault();
@@ -76,20 +77,30 @@ export default function PassengerScreen() {
   return (
     <div className="skyfood-page">
       <header className="sf-header">
-        <a href="#hero" className="sf-logo"><span className="sf-logo-icon">✈</span> <span>Sky<span style={{ color: 'var(--blue)' }}>Food</span></span></a>
-        <nav className="sf-nav">
-          <a href="#hero">Главная</a><a href="#how">Как работает</a><a href="#check-section">Проверить</a>
-          <a href="#cafes-list">Где воспользоваться</a><a href="#rules">Правила</a><a href="#contacts">Контакты</a>
+        <a href="#hero" className="sf-logo">
+          <span className="sf-logo-icon">✈</span> 
+          <span>Sky<span style={{ color: 'var(--blue)' }}>Food</span></span>
+        </a>
+        <button className="sf-burger" onClick={() => setIsMenuOpen(!isMenuOpen)}>
+          <span></span><span></span><span></span>
+        </button>
+        <nav className={`sf-nav ${isMenuOpen ? 'sf-nav--open' : ''}`}>
+          <a href="#hero" onClick={() => setIsMenuOpen(false)}>Главная</a>
+          <a href="#how" onClick={() => setIsMenuOpen(false)}>Как работает</a>
+          <a href="#check-section" onClick={() => setIsMenuOpen(false)}>Проверить</a>
+          <a href="#cafes-list" onClick={() => setIsMenuOpen(false)}>Где воспользоваться</a>
+          <a href="#rules" onClick={() => setIsMenuOpen(false)}>Правила</a>
+          <a href="#contacts" onClick={() => setIsMenuOpen(false)}>Контакты</a>
         </nav>
       </header>
 
       <main>
-        {/* ГЛАВНЫЙ ЭКРАН (КАРТИНКА НА ВЕСЬ БЛОК С ГРАДИЕНТОМ) */}
+        {/* HERO (БЕЗ ГРАДИЕНТА, ТЕКСТ С ТЕНЬЮ) */}
         <section className="sf-hero" id="hero">
           <div className="sf-hero-image">
             <img src={coffeeImage} alt="Кофе и круассан" />
           </div>
-          <div className="sf-hero-overlay"></div>
+           <div className="sf-hero-overlay"></div>
           <div className="sf-hero-content">
             <div className="sf-badge">✈ ЧУТЬ БОЛЬШЕ ЗАБОТЫ В ПУТИ</div>
             <h1>SkyFood — вкусное решение при задержке рейса</h1>
@@ -109,20 +120,17 @@ export default function PassengerScreen() {
             </div>
 
             <form onSubmit={handleCheck} className="sf-check-form">
-<input type="text" value={ticket} onChange={(e) => setTicket(e.target.value)} placeholder="Код посадочного талона" />
+              <input type="text" value={ticket} onChange={(e) => setTicket(e.target.value)} placeholder="Код талона" />
               <button type="submit" disabled={loading}>{loading ? 'Проверяем...' : 'Проверить'}</button>
             </form>
             
-            {error && <div className="sf-error-message"><strong>{error}</strong></div>}
+            {error && <div className="sf-error-message"><h3>Посадочный талон не найден</h3><p>Проверьте правильность введённого кода или попробуйте отсканировать посадочный талон ещё раз.</p></div>}
             
-                        {data && (
+            {data && (
               <>
                 {data.status === 'Активен' && (
                   <div className="sf-voucher-card">
-                    <div className="sf-voucher-header">
-                      <span>Ваш ваучер SkyFood</span>
-                      <span className="sf-voucher-status">{data.status}</span>
-                    </div>
+                    <div className="sf-voucher-header"><span>Ваш ваучер SkyFood</span><span className="sf-voucher-status">{data.status}</span></div>
                     <div className="sf-voucher-body">
                       <div className="sf-voucher-field"><span className="sf-field-label">Пассажир:</span><span className="sf-field-value">{data.passengerName}</span></div>
                       <div className="sf-voucher-field"><span className="sf-field-label">Тип ваучера:</span><span className="sf-field-value">{data.voucherType}</span></div>
@@ -133,52 +141,36 @@ export default function PassengerScreen() {
                       <span className="sf-balance-label">Доступный остаток:</span>
                       <span className="sf-balance-value">{data.balance} {data.currency}</span>
                     </div>
-                    <div className="sf-voucher-instruction">
-                      <p>Предъявите посадочный талон сотруднику участвующего в программе кафе. Сотрудник проверит ваш ваучер и поможет оформить покупку.</p>
-                    </div>
+                    <div className="sf-voucher-instruction"><p>Предъявите посадочный талон сотруднику участвующего в программе кафе. Сотрудник проверит ваш ваучер и поможет оформить покупку.</p></div>
                   </div>
                 )}
-                
-                {data.status === 'Не выдан' && (
-                  <div className="sf-info-message">
-                    <h3>Ваучер пока недоступен</h3>
-                    <p>По вашему посадочному талону пока нет доступного ваучера SkyFood. Если ваш рейс задержан, проверьте информацию позднее.</p>
-                  </div>
-                )}
-
-                {data.status === 'Закрыт' && (
-                  <div className="sf-error-message">
-                    <h3>Ваучер больше не действует</h3>
-                    <p>Ваучер закрыт. Его использование для новых покупок недоступно.</p>
-                  </div>
-                )}
+                {data.status === 'Не выдан' && <div className="sf-info-message"><h3>Ваучер пока недоступен</h3><p>По вашему посадочному талону пока нет доступного ваучера SkyFood. Если ваш рейс задержан, проверьте информацию позднее.</p></div>}
+                {data.status === 'Закрыт' && <div className="sf-error-message"><h3>Ваучер больше не действует</h3><p>Ваучер закрыт. Его использование для новых покупок недоступно.</p></div>}
               </>
             )}
 
-                       <div className="sf-hint-container">
+            <div className="sf-hint-container">
               <div className="sf-hint-left">
                 <div className="sf-mini-ticket-ui">
                   <div className="sf-mt-top"><span>BOARDING PASS</span><span>✈</span></div>
                   <div className="sf-mt-route"><span>SVO</span> <span>→</span> <span>LED</span></div>
                   <div className="sf-mt-gate">GATE 12 · SEAT 18A</div>
                 </div>
-                
                 <div className="sf-hint-code">
-                  <span className="sf-hint-label">КОД ПОСАДОЧНОГО ТАЛОНА</span>
-                  <span className="sf-hint-value">BP-ХХХХ-ХХ</span>
+                  <span className="sf-hint-label">КОД ТАЛОНА</span>
+                  <span className="sf-hint-value">TK-849201</span>
                   <div className="sf-barcode"></div>
                 </div>
               </div>
-
               <div className="sf-hint-right">
                 <h4>Где найти код?</h4>
-                <p>Введите код посадочного талона, указанный на вашем билете.</p>
-                <p className="sf-hint-example"><IconTicket /> Пример: BP-1001-01</p>
+                <p>Введите 6 символов с талона — как в выделенной части образца.</p>
+                <p className="sf-hint-example"><IconTicket /> Пример: TK-849201 · латиницей</p>
                 <div className="sf-test-codes">
-                  <strong>Тестовые коды:</strong>
-                  <span>BP-1001-01 (активен)</span>
-                  <span>BP-1001-02 (не выдан)</span>
-                  <span>BP-1001-03 (закрыт)</span>
+                  <strong>Тестовые коды (латиницей):</strong>
+                  <span>TK-849201 (активен)</span>
+                  <span>TK-000001 (не выдан)</span>
+                  <span>TK-999999 (закрыт)</span>
                 </div>
               </div>
             </div>
@@ -198,7 +190,6 @@ export default function PassengerScreen() {
           </article>
         </section>
 
-        {/* КАФЕ */}
         <section className="sf-info-section" id="cafes-list">
           <div className="sf-section-label">ГДЕ ПОЛУЧИТЬ</div>
           <h2 className="sf-info-title">Где воспользоваться ваучером</h2>
@@ -239,10 +230,8 @@ export default function PassengerScreen() {
               </div>
             ))}
           </div>
-      
         </section>
 
-        {/* КАК ЭТО РАБОТАЕТ */}
         <section className="sf-how-section" id="how">
           <div className="sf-section-label">ВСЁ ПРОСТО</div>
           <h2 className="sf-info-title">Как это работает</h2>
@@ -253,7 +242,6 @@ export default function PassengerScreen() {
           </div>
         </section>
 
-        {/* ПРАВИЛА */}
         <section className="sf-info-section" id="rules">
           <div className="sf-section-label">ПОЛЕЗНО ЗНАТЬ ЗАРАНЕЕ</div>
           <h2 className="sf-info-title">Правила использования</h2>
@@ -268,34 +256,18 @@ export default function PassengerScreen() {
             <div className="sf-rule-item"><div className="sf-rule-icon"><IconClock /></div><div><strong>Когда ваучер перестаёт действовать</strong><p>При начале посадки, отмене или вылете рейса ваучер закрывается. После закрытия новые покупки невозможны.</p></div></div>
             <div className="sf-rule-item"><div className="sf-rule-icon"><IconBag /></div><div><strong>Что можно купить</strong><p>Разрешённые продукты и напитки. Спиртные напитки и табачные изделия приобрести нельзя.</p></div></div>
           </div>
-          <div className="sf-info-footer" style={{ marginTop: '20px' }}>
-            <strong>Особое внимание:</strong> Размер ваучера зависит от авиакомпании. Список разрешённых товаров зависит от типа ваучера. При начале посадки, отмене или вылете рейса ваучер закрывается. После закрытия ваучера новые покупки невозможны.
-          </div>
+          <div className="sf-info-footer"><strong>Особое внимание:</strong> Размер ваучера зависит от авиакомпании. Список разрешённых товаров зависит от типа ваучера. При начале посадки, отмене или вылете рейса ваучер закрывается. После закрытия ваучера новые покупки невозможны.</div>
         </section>
 
-                {/* КОНТАКТЫ И ФУТЕР */}
         <section className="sf-info-section" id="contacts">
           <div className="sf-contacts-grid">
             <div>
               <h2 className="sf-info-title">Контакты</h2>
               <p>Нужна помощь с ваучером? Мы рядом, чтобы ваша пауза в аэропорту прошла спокойнее.</p>
             </div>
-            <div className="sf-contact-block">
-              <IconMail />
-              <div>
-                <strong>support@skyfood.example</strong>
-                <span>Для вопросов о ваучерах</span>
-              </div>
-            </div>
-            <div className="sf-contact-block">
-              <IconPhone />
-              <div>
-                <strong>8 800 000-00-00</strong>
-                <span>Ежедневно · 08:00–22:00 МСК</span>
-              </div>
-            </div>
+            <div className="sf-contact-block"><IconMail /><div><strong>support@skyfood.example</strong><span>Для вопросов о ваучерах</span></div></div>
+            <div className="sf-contact-block"><IconPhone /><div><strong>8 800 000-00-00</strong><span>Ежедневно · 08:00–22:00 МСК</span></div></div>
           </div>
-
           <div className="sf-footer-bar">
             <div className="sf-footer-left">© 2026 SkyFood. С заботой о пути.</div>
             <div className="sf-footer-right">
@@ -304,10 +276,7 @@ export default function PassengerScreen() {
               <span><IconHeart /> Забота в деталях</span>
             </div>
           </div>
-          
-          <div className="sf-footer-legal">
-            Иллюстративный макет сервиса. Контакты и заведения приведены в качестве примера; партнёрства с авиакомпаниями не заявляются.
-          </div>
+          <div className="sf-footer-legal">Иллюстративный макет сервиса. Контакты и заведения приведены в качестве примера; партнёрства с авиакомпаниями не заявляются.</div>
         </section>
       </main>
     </div>
