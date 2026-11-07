@@ -95,6 +95,7 @@ export default function PassengerScreen() {
 
       <main>
         <section className="sf-hero" id="hero">
+            <section className="sf-hero sf-hero-mobile" id="hero"></section>
           <div className="sf-hero-image">
             <img src={coffeeImage} alt="Кофе и круассан" />
           </div>

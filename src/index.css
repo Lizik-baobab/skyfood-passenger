@@ -365,3 +365,85 @@ button { cursor: pointer; }
   .sf-footer-right { flex-direction: column; gap: 10px; }
   .sf-info-grid { grid-template-columns: 1fr; }
 }
+/* ================= МОБИЛЬНЫЙ ГЛАВНЫЙ ЭКРАН (КАК НА СКРИНШОТЕ 1) ================= */
+@media (max-width: 768px) {
+  .sf-hero-mobile {
+    display: flex !important;
+    flex-direction: column !important;
+    height: auto !important;
+    min-height: auto !important;
+    background: #FFF4E8 !important; /* Кремовый фон */
+    margin: 0 !important;
+    border-radius: 0 !important;
+  }
+
+  /* Текст и кнопка идут первыми */
+  .sf-hero-mobile .sf-hero-content {
+    order: 1;
+    position: relative !important;
+    padding: 30px 20px !important;
+    height: auto !important;
+    display: flex;
+    flex-direction: column;
+    z-index: 2;
+  }
+
+  .sf-hero-mobile .sf-badge {
+    margin-bottom: 10px;
+  }
+
+  .sf-hero-mobile h1 {
+    font-size: 30px !important;
+    color: var(--navy);
+    margin-bottom: 15px !important;
+  }
+
+  .sf-hero-mobile p {
+    font-size: 14px !important;
+    margin-bottom: 20px !important;
+  }
+
+  .sf-hero-mobile .sf-primary-button {
+    width: 100% !important;
+    max-width: 100% !important;
+    margin-bottom: 15px !important;
+  }
+
+  .sf-hero-mobile .sf-hero-note {
+    display: flex;
+    justify-content: center;
+    color: #526782;
+  }
+
+  /* Картинка идет второй и плавно переходит из кремового */
+  .sf-hero-mobile .sf-hero-image {
+    order: 2;
+    position: relative !important;
+    width: 100% !important;
+    height: 350px !important;
+    inset: auto !important;
+    z-index: 1;
+  }
+
+  .sf-hero-mobile .sf-hero-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  /* Градиентный переход от кремового к картинке */
+  .sf-hero-mobile .sf-hero-image::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 100px;
+    background: linear-gradient(180deg, #FFF4E8 0%, rgba(255, 244, 232, 0) 100%);
+    z-index: 2;
+    pointer-events: none;
+  }
+
+  /* Скрываем старый оверлей */
+  .sf-hero-mobile .sf-hero-overlay {
+    display: none !important;
+  }
+}
