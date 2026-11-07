@@ -1,1109 +1,490 @@
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { checkTicket } from '../services/passengerService';
+
 import coffeeImage from '../assets/coffee.png';
+import cafeAerocafeImage from '../assets/cafe-aerocafe.png';
+import cafeCoffeePointImage from '../assets/cafe-coffee-point.png';
+import cafeTerminalBistroImage from '../assets/cafe-terminal-bistro.png';
+import cafeVolgaImage from '../assets/cafe-volga.png';
+import cafeHouseImage from '../assets/cafe-house.png';
+import cafeAirportFoodImage from '../assets/cafe-airport-food.png';
+import cafePulkovoImage from '../assets/cafe-pulkovo.png';
+import cafePulkovoCoffeeImage from '../assets/cafe-pulkovo-coffee.png';
+import cafePulkovoBistroImage from '../assets/cafe-pulkovo-bistro.png';
 
-// --- Иконки ---
-const IconSearch = () => (
-  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-    <circle cx="11" cy="11" r="8"></circle>
-    <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
-  </svg>
-);
+const Icon = ({ name, size = 20 }) => {
+  const common = {
+    width: size, height: size, viewBox: '0 0 24 24', fill: 'none',
+    stroke: 'currentColor', strokeWidth: 1.8, strokeLinecap: 'round',
+    strokeLinejoin: 'round', 'aria-hidden': true
+  };
 
-const IconTicket = () => (
-  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-    <path d="M2 9a3 3 0 0 1 0 6v2a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-2a3 3 0 0 1 0-6V7a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2Z"></path>
-    <path d="M13 5v2"></path>
-    <path d="M13 17v2"></path>
-    <path d="M13 11v2"></path>
-  </svg>
-);
+  const paths = {
+    plane: <><path d="M2.5 16.5 21 3l-6.5 18-3.8-7.2-8.2 2.7Z"/><path d="m10.7 13.8 5.1-5.1"/></>,
+    search: <><circle cx="11" cy="11" r="7"/><path d="m20 20-4-4"/></>,
+    ticket: <><path d="M3 7a2 2 0 0 0 0 4v2a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-2a2 2 0 0 0 0-4V5a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2Z"/><path d="M13 3v2m0 4v2m0 4v2"/></>,
+    water: <><path d="M12 2.8 6.5 9a7.5 7.5 0 1 0 11 0L12 2.8Z"/><path d="M9 15a3.5 3.5 0 0 0 3.5 3.5"/></>,
+    meal: <><path d="M3 2v7a3 3 0 0 0 6 0V2M6 2v20M16 2v20m0-20c3 2 4 5 4 9h-4"/></>,
+    refresh: <><path d="M20 7v5h-5M4 17v-5h5"/><path d="M5.5 9A7 7 0 0 1 18 6l2 2M4 16l2 2a7 7 0 0 0 12.5-3"/></>,
+    pin: <><path d="M20 10c0 5-8 12-8 12S4 15 4 10a8 8 0 1 1 16 0Z"/><circle cx="12" cy="10" r="2.5"/></>,
+    arrow: <><path d="M5 12h14M13 6l6 6-6 6"/></>,
+    external: <><path d="M14 4h6v6M20 4l-9 9"/><path d="M18 13v5a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h5"/></>,
+    shield: <><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10Z"/><path d="m9 12 2 2 4-4"/></>,
+    mail: <><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m3 7 9 6 9-6"/></>,
+    phone: <path d="M21 16.5v3a2 2 0 0 1-2.2 2A19 19 0 0 1 10.5 18a19 19 0 0 1-5.8-5.8A19 19 0 0 1 2.8 3.7 2 2 0 0 1 4.8 1.5h3a2 2 0 0 1 2 1.7l.4 2.5a2 2 0 0 1-.6 1.8L8.3 8.8a16 16 0 0 0 6 6l1.3-1.3a2 2 0 0 1 1.8-.6l2.5.4a2 2 0 0 1 1.1 1.2Z"/>,
+    clock: <><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></>,
+    heart: <path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.7l-1-1.1a5.5 5.5 0 0 0-7.8 7.8l1 1.1 7.8 7.7 7.8-7.7 1-1.1a5.5 5.5 0 0 0 0-7.8Z"/>,
+    bag: <><path d="M5 8h14l1 13H4L5 8Z"/><path d="M9 9V6a3 3 0 0 1 6 0v3"/></>,
+    info: <><circle cx="12" cy="12" r="9"/><path d="M12 11v5m0-8h.01"/></>,
+    sparkle: <><path d="m12 2 1.8 6.2L20 10l-6.2 1.8L12 18l-1.8-6.2L4 10l6.2-1.8L12 2Z"/><path d="m19 15 .8 2.2L22 18l-2.2.8L19 21l-.8-2.2L16 18l2.2-.8L19 15Z"/></>,
+    menu: <><path d="M4 7h16M4 12h16M4 17h16"/></>,
+    close: <><path d="m18 6-12 12M6 6l12 12"/></>
+  };
 
-const IconWater = () => (
-  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-    <path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z"></path>
-  </svg>
-);
-
-const IconMeal = () => (
-  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-    <path d="M3 2v7c0 1.1.9 2 2 2h4a2 2 0 0 0 2-2V2"></path>
-    <path d="M7 2v20"></path>
-    <path d="M21 15V2v0a5 5 0 0 0-5 5v6c0 1.1.9 2 2 2h3Zm0 0v7"></path>
-  </svg>
-);
-
-const IconRefresh = () => (
-  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-    <polyline points="23 4 23 10 17 10"></polyline>
-    <polyline points="1 20 1 14 7 14"></polyline>
-    <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path>
-  </svg>
-);
-
-const IconShield = () => (
-  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-    <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
-  </svg>
-);
-
-const IconCafe = () => (
-  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-    <path d="M18 8h1a4 4 0 0 1 0 8h-1"></path>
-    <path d="M2 8h16v9a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4V8z"></path>
-    <line x1="6" y1="1" x2="6" y2="4"></line>
-    <line x1="10" y1="1" x2="10" y2="4"></line>
-    <line x1="14" y1="1" x2="14" y2="4"></line>
-  </svg>
-);
-
-const IconHeart = () => (
-  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-    <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
-  </svg>
-);
-
-const IconArrow = () => (
-  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
-    <line x1="5" y1="12" x2="19" y2="12"></line>
-    <polyline points="12 5 19 12 12 19"></polyline>
-  </svg>
-);
-
-const IconArrowUpRight = () => (
-  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-    <line x1="7" y1="17" x2="17" y2="7"></line>
-    <polyline points="7 7 17 7 17 17"></polyline>
-  </svg>
-);
-
-const IconMapPin = () => (
-  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-    <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
-    <circle cx="12" cy="10" r="3"></circle>
-  </svg>
-);
-
-const IconMail = () => (
-  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-    <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path>
-    <polyline points="22,6 12,13 2,6"></polyline>
-  </svg>
-);
-
-const IconPhone = () => (
-  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-    <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path>
-  </svg>
-);
-
-const IconClock = () => (
-  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-    <circle cx="12" cy="12" r="10"></circle>
-    <polyline points="12 6 12 12 16 14"></polyline>
-  </svg>
-);
-
-const IconBag = () => (
-  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-    <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"></path>
-    <line x1="3" y1="6" x2="21" y2="6"></line>
-    <path d="M16 10a4 4 0 0 1-8 0"></path>
-  </svg>
-);
-
-const IconHelp = () => (
-  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-    <circle cx="12" cy="12" r="10"></circle>
-    <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path>
-    <line x1="12" y1="17" x2="12.01" y2="17"></line>
-  </svg>
-);
-
-// --- Иконки статусов ваучера ---
-
-const IconStatusClock = () => (
-  <svg
-    viewBox="0 0 24 24"
-    width="29"
-    height="29"
-    fill="none"
-    stroke="currentColor"
-    strokeWidth="1.8"
-    strokeLinecap="round"
-    strokeLinejoin="round"
-  >
-    <circle cx="12" cy="12" r="9" />
-    <path d="M12 7v5l3 2" />
-  </svg>
-);
-
-const IconStatusLock = () => (
-  <svg
-    viewBox="0 0 24 24"
-    width="14"
-    height="14"
-    fill="none"
-    stroke="currentColor"
-    strokeWidth="2"
-    strokeLinecap="round"
-    strokeLinejoin="round"
-  >
-    <rect x="4" y="10" width="16" height="11" rx="2" />
-    <path d="M8 10V7a4 4 0 0 1 8 0v3" />
-  </svg>
-);
-
-const IconStatusTicket = () => (
-  <svg
-    viewBox="0 0 24 24"
-    width="29"
-    height="29"
-    fill="none"
-    stroke="currentColor"
-    strokeWidth="1.8"
-    strokeLinecap="round"
-    strokeLinejoin="round"
-  >
-    <path d="M3 8a2 2 0 0 0 0 4v4a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-4a2 2 0 0 1 0-4V7a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2z" />
-    <path d="m9 9 6 6m0-6-6 6" />
-  </svg>
-);
-
-const IconStatusInfo = () => (
-  <svg
-    viewBox="0 0 24 24"
-    width="20"
-    height="20"
-    fill="none"
-    stroke="currentColor"
-    strokeWidth="2"
-    strokeLinecap="round"
-    strokeLinejoin="round"
-  >
-    <circle cx="12" cy="12" r="9" />
-    <path d="M12 11v5m0-8h.01" />
-  </svg>
-);
-
-// --- Данные кафе ---
-
-const CAFES = [
-  {
-    id: 1,
-    name: 'АэроКафе',
-    airport: 'SVO',
-    terminal: 'B',
-    floor: '2',
-    sector: '3',
-    zone: 'После досмотра · у выхода 12',
-    category: 'Кофе и выпечка',
-    img: 'https://images.unsplash.com/photo-1554118811-1e0d58224f24?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80'
-  },
-  {
-    id: 2,
-    name: 'Coffee Point',
-    airport: 'SVO',
-    terminal: 'C',
-    floor: '1',
-    sector: '2',
-    zone: 'Общая зона · уровень вылета',
-    category: 'Сэндвичи и перекусы',
-    img: 'https://images.unsplash.com/photo-1509722747041-616f39b57569?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80'
-  },
-  {
-    id: 3,
-    name: 'Terminal Bistro',
-    airport: 'SVO',
-    terminal: 'D',
-    floor: '3',
-    sector: '1',
-    zone: 'После досмотра · у выхода 18',
-    category: 'Горячие блюда',
-    img: 'https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80'
-  },
-  {
-    id: 4,
-    name: 'Волга Кафе',
-    airport: 'KZN',
-    terminal: '1',
-    floor: '2',
-    sector: 'B',
-    zone: 'Центральная зона',
-    category: 'Национальная кухня',
-    img: 'https://images.unsplash.com/photo-1552566626-52f8b828add9?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80'
-  },
-  {
-    id: 5,
-    name: 'Coffee House',
-    airport: 'KZN',
-    terminal: '1',
-    floor: '1',
-    sector: 'A',
-    zone: 'Зона прилета',
-    category: 'Кофе и десерты',
-    img: 'https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80'
-  },
-  {
-    id: 6,
-    name: 'Airport Food',
-    airport: 'KZN',
-    terminal: '1',
-    floor: '3',
-    sector: 'C',
-    zone: 'Зона вылета',
-    category: 'Фастфуд',
-    img: 'https://images.unsplash.com/photo-1561758033-d89a9ad46330?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80'
-  },
-  {
-    id: 7,
-    name: 'Пулково Кафе',
-    airport: 'LED',
-    terminal: '1',
-    floor: '3',
-    sector: 'A',
-    zone: 'После досмотра',
-    category: 'Завтраки',
-    img: 'https://images.unsplash.com/photo-1559339352-11d035aa65de?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80'
-  },
-  {
-    id: 8,
-    name: 'Coffee Point',
-    airport: 'LED',
-    terminal: '1',
-    floor: '1',
-    sector: 'B',
-    zone: 'Зона прилета',
-    category: 'Кофе с собой',
-    img: 'https://images.unsplash.com/photo-1511920170033-f8396924c348?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80'
-  },
-  {
-    id: 9,
-    name: 'Terminal Bistro',
-    airport: 'LED',
-    terminal: '1',
-    floor: '2',
-    sector: 'C',
-    zone: 'Общая зона',
-    category: 'Горячие блюда',
-    img: 'https://images.unsplash.com/photo-1414235077428-338989a2e8c0?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80'
-  },
-];
-
-// --- Города и аэропорты ---
+  return <svg {...common}>{paths[name] || null}</svg>;
+};
 
 const CITIES = [
-  {
-    name: 'Москва',
-    airports: [{ code: 'SVO', name: 'Шереметьево' }]
-  },
-  {
-    name: 'Казань',
-    airports: [{ code: 'KZN', name: 'Казань' }]
-  },
-  {
-    name: 'Санкт-Петербург',
-    airports: [{ code: 'LED', name: 'Пулково' }]
-  },
+  { name: 'Москва', airports: [{ code: 'SVO', name: 'Шереметьево' }] },
+  { name: 'Казань', airports: [{ code: 'KZN', name: 'Казань' }] },
+  { name: 'Санкт-Петербург', airports: [{ code: 'LED', name: 'Пулково' }] },
 ];
 
-// --- Основной компонент ---
+const CAFES = [
+  { id: 1, name: 'АэроКафе', airport: 'SVO', terminal: 'B', zone: 'После досмотра · у выхода 12', category: 'Кофе и выпечка', image: cafeAerocafeImage },
+  { id: 2, name: 'Coffee Point', airport: 'SVO', terminal: 'C', zone: 'Общая зона · уровень вылета', category: 'Сэндвичи и перекусы', image: cafeCoffeePointImage },
+  { id: 3, name: 'Terminal Bistro', airport: 'SVO', terminal: 'D', zone: 'После досмотра · у выхода 18', category: 'Горячие блюда', image: cafeTerminalBistroImage },
+  { id: 4, name: 'Волга Кафе', airport: 'KZN', terminal: '1', zone: 'Центральная зона', category: 'Национальная кухня', image: cafeVolgaImage },
+  { id: 5, name: 'Coffee House', airport: 'KZN', terminal: '1', zone: 'Зона прилёта', category: 'Кофе и десерты', image: cafeHouseImage },
+  { id: 6, name: 'Airport Food', airport: 'KZN', terminal: '1', zone: 'Зона вылета', category: 'Фастфуд', image: cafeAirportFoodImage },
+  { id: 7, name: 'Пулково Кафе', airport: 'LED', terminal: '1', zone: 'После досмотра', category: 'Завтраки', image: cafePulkovoImage },
+  { id: 8, name: 'Coffee Point', airport: 'LED', terminal: '1', zone: 'Зона прилёта', category: 'Кофе с собой', image: cafePulkovoCoffeeImage },
+  { id: 9, name: 'Terminal Bistro', airport: 'LED', terminal: '1', zone: 'Общая зона', category: 'Горячие блюда', image: cafePulkovoBistroImage },
+];
+
+const RULES = [
+  { icon: 'plane', title: 'При каких условиях предоставляется', text: 'Ваучер предоставляется пассажирам при задержке рейса, если авиакомпания участвует в программе SkyFood.' },
+  { icon: 'refresh', title: 'Какие виды существуют', text: 'Программа предусматривает два типа: WATER (вода) и MEAL (питание).' },
+  { icon: 'water', title: 'Чем отличаются WATER и MEAL', text: 'WATER предоставляется при меньшем времени задержки и предназначен для покупки воды. MEAL — при более длительном ожидании, для питания.' },
+  { icon: 'search', title: 'Как проверить наличие', text: 'Введите код посадочного талона в разделе «Проверить ваучер» на этой странице.' },
+  { icon: 'meal', title: 'Как воспользоваться в кафе', text: 'Предъявите посадочный талон сотруднику кафе-партнёра. Он проверит ваучер и поможет оформить заказ.' },
+  { icon: 'ticket', title: 'Можно ли использовать несколько раз', text: 'Да, ваучер можно использовать до тех пор, пока на нём есть остаток средств.' },
+  { icon: 'clock', title: 'Когда ваучер перестаёт действовать', text: 'При начале посадки, отмене или вылете рейса ваучер закрывается. После закрытия новые покупки невозможны.' },
+  { icon: 'bag', title: 'Что можно купить', text: 'Разрешённые продукты и напитки. Спиртные напитки и табачные изделия приобрести нельзя.' },
+];
+
+const NAV_ITEMS = [
+  ['Главная', '#hero'],
+  ['Как работает', '#how'],
+  ['Проверить', '#check-section'],
+  ['Где воспользоваться', '#cafes-list'],
+  ['Правила', '#rules'],
+  ['Контакты', '#contacts'],
+];
+
+const BARCODE = [2,1,1,2,1,1,2,1,1,2,1,1,2,1,1,2,1,1,2,1,1,2,1,1,2,1,1,2,1,1];
+
+function BoardingPass() {
+  return (
+    <div className="sf-boarding-pass" aria-label="Образец посадочного талона">
+      <div className="sf-bp-top"><span>BOARDING PASS</span><Icon name="plane" size={12} /></div>
+      <div className="sf-bp-route">SVO <span>→</span> LED</div>
+      <div className="sf-bp-meta">GATE 12 · SEAT 18A</div>
+      <div className="sf-bp-bottom">
+        <div className="sf-bp-code-wrap">
+          <span className="sf-bp-label">КОД ТАЛОНА</span>
+          <strong className="sf-bp-code">BP-1001-01</strong>
+        </div>
+        <div className="sf-bp-barcode" aria-hidden="true">
+          {BARCODE.map((width, index) => <i key={index} style={{ width }} />)}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function LoadingVoucher({ ticket }) {
+  return (
+    <section className="sf-state-card is-loading" role="status" aria-live="polite" aria-busy="true">
+      <div className="sf-state-topline">
+        <span className="sf-state-code">Код талона: {ticket}</span>
+        <span className="sf-state-badge"><i className="sf-spinner" /> Проверка</span>
+      </div>
+      <div className="sf-state-icon"><i className="sf-spinner" /></div>
+      <div className="sf-state-copy">
+        <h3>Проверяем…</h3>
+        <p>Сверяем данные посадочного талона. Это займёт несколько секунд.</p>
+      </div>
+      <div className="sf-loading-progress"><span /></div>
+      <p className="sf-state-note">Не закрывайте страницу — результат появится автоматически.</p>
+    </section>
+  );
+}
 
 export default function PassengerScreen() {
   const [ticket, setTicket] = useState('');
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
-
   const [selectedCity, setSelectedCity] = useState('Москва');
   const [selectedAirport, setSelectedAirport] = useState('SVO');
+  const [menuOpen, setMenuOpen] = useState(false);
+  const requestIdRef = useRef(0);
 
-  // Состояние мобильного меню
-  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const currentCity = CITIES.find(city => city.name === selectedCity);
+  const availableAirports = currentCity ? currentCity.airports : [];
+  const filteredCafes = CAFES.filter(cafe => cafe.airport === selectedAirport);
 
-  // Проверка ваучера
-  const handleCheck = async (e) => {
-    e.preventDefault();
+  useEffect(() => {
+    document.body.classList.toggle('sf-menu-is-open', menuOpen);
+    return () => document.body.classList.remove('sf-menu-is-open');
+  }, [menuOpen]);
 
+  useEffect(() => {
+    if (!menuOpen) return undefined;
+    const closeOnEscape = event => {
+      if (event.key === 'Escape') setMenuOpen(false);
+    };
+    window.addEventListener('keydown', closeOnEscape);
+    return () => window.removeEventListener('keydown', closeOnEscape);
+  }, [menuOpen]);
+
+  const handleCityChange = event => {
+    const cityName = event.target.value;
+    setSelectedCity(cityName);
+    const city = CITIES.find(item => item.name === cityName);
+    if (city?.airports?.length) setSelectedAirport(city.airports[0].code);
+  };
+
+  const handleCheck = async event => {
+    event.preventDefault();
     const code = ticket.trim();
-
     if (!code || loading) return;
 
+    const currentRequestId = ++requestIdRef.current;
     setLoading(true);
     setError('');
     setData(null);
 
     try {
       const result = await checkTicket(code);
-      setData(result);
+      if (requestIdRef.current !== currentRequestId) return;
+
+      if (!result) {
+        setError('По этому коду не удалось найти информацию. Проверьте номер и попробуйте ещё раз.');
+      } else {
+        setData(result);
+      }
     } catch (err) {
-      setError(
-        err?.message ||
-        'Не удалось проверить ваучер. Попробуйте ещё раз позднее.'
-      );
+      if (requestIdRef.current === currentRequestId) {
+        setError(err?.message || 'Не удалось проверить ваучер. Попробуйте ещё раз позднее.');
+      }
     } finally {
-      setLoading(false);
+      if (requestIdRef.current === currentRequestId) {
+        setLoading(false);
+      }
     }
   };
 
-  // Выбор города и аэропорта
-  const currentCity = CITIES.find(c => c.name === selectedCity);
-  const availableAirports = currentCity ? currentCity.airports : [];
-
-  const handleCityChange = (e) => {
-    const cityName = e.target.value;
-
-    setSelectedCity(cityName);
-
-    const city = CITIES.find(c => c.name === cityName);
-
-    if (city && city.airports.length > 0) {
-      setSelectedAirport(city.airports[0].code);
-    }
+  const handleClear = () => {
+    requestIdRef.current += 1;
+    setTicket('');
+    setData(null);
+    setError('');
+    setLoading(false);
   };
 
-  const filteredCafes = CAFES.filter(
-    cafe => cafe.airport === selectedAirport
-  );
+  const closeMenu = () => setMenuOpen(false);
+
+  const handleNavClick = () => {
+    closeMenu();
+  };
+
+  const status = data?.status?.trim();
+  const isActive = status === 'Активен';
+  const isNotIssued = status === 'Не выдан';
+  const isClosed = status === 'Закрыт';
+  const isUnknownStatus = Boolean(data && !isActive && !isNotIssued && !isClosed);
 
   return (
-    <div className="skyfood-page">
-
-      {/* ШАПКА САЙТА */}
-
-      <header className="sf-header">
-        <a href="#hero" className="sf-logo">
-          <span className="sf-logo-icon">✈</span>
-          <span>
-            Sky<span style={{ color: 'var(--blue)' }}>Food</span>
-          </span>
-        </a>
-
-        {/* Десктопное меню */}
-
-        <nav className="sf-nav sf-nav-desktop">
-          <a href="#hero">Главная</a>
-          <a href="#how">Как работает</a>
-          <a href="#check-section">Проверить</a>
-          <a href="#cafes-list">Где воспользоваться</a>
-          <a href="#rules">Правила</a>
-          <a href="#contacts">Контакты</a>
-        </nav>
-
-        {/* Кнопка мобильного меню */}
-
-        <button
-          className="sf-burger"
-          onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-          aria-label="Меню"
-        >
-          {isMobileMenuOpen ? '✕' : '☰'}
-        </button>
-
-        {/* Мобильное меню */}
-
-        <nav className={`sf-nav-mobile ${isMobileMenuOpen ? 'open' : ''}`}>
-          <a href="#hero" onClick={() => setIsMobileMenuOpen(false)}>
-            Главная
+    <div className="sf-site-shell">
+      <div className="sf-site-container">
+        <header className="sf-header">
+          <a href="#hero" className="sf-logo" onClick={handleNavClick}>
+            <span className="sf-logo-mark"><Icon name="plane" size={22} /></span>
+            <span>SkyFood</span>
           </a>
-          <a href="#how" onClick={() => setIsMobileMenuOpen(false)}>
-            Как работает
-          </a>
-          <a href="#check-section" onClick={() => setIsMobileMenuOpen(false)}>
-            Проверить
-          </a>
-          <a href="#cafes-list" onClick={() => setIsMobileMenuOpen(false)}>
-            Где воспользоваться
-          </a>
-          <a href="#rules" onClick={() => setIsMobileMenuOpen(false)}>
-            Правила
-          </a>
-          <a href="#contacts" onClick={() => setIsMobileMenuOpen(false)}>
-            Контакты
-          </a>
-        </nav>
-      </header>
 
-      <main>
+          <nav className="sf-nav sf-desktop-nav" aria-label="Основная навигация">
+            {NAV_ITEMS.map(([label, href], index) => (
+              <a className={index === 0 ? 'is-active' : ''} href={href} key={href}>{label}</a>
+            ))}
+          </nav>
 
-        {/* ГЛАВНЫЙ ЭКРАН */}
+          <button
+            className="sf-menu-button"
+            type="button"
+            aria-label="Открыть меню"
+            aria-expanded={menuOpen}
+            aria-controls="sf-mobile-menu"
+            onClick={() => setMenuOpen(true)}
+          >
+            <Icon name="menu" size={22} />
+          </button>
+        </header>
 
-        <section className="sf-hero" id="hero">
-          <div className="sf-hero-image">
-            <img src={coffeeImage} alt="Кофе и круассан" />
-          </div>
-
-          <div className="sf-hero-overlay"></div>
-
-          <div className="sf-hero-content">
-            <div className="sf-badge">
-              ✈ ЧУТЬ БОЛЬШЕ ЗАБОТЫ В ПУТИ
-            </div>
-
-            <h1>
-              SkyFood — вкусное решение при задержке рейса
-            </h1>
-
-            <p>
-              Пусть ожидание станет приятнее. Проверьте ваучер
-              и обменяйте его на воду или обед в аэропорту.
-            </p>
-
-            <button
-              className="sf-primary-button"
-              onClick={() =>
-                document.getElementById('check-section')?.scrollIntoView({
-                  behavior: 'smooth'
-                })
-              }
-            >
-              Проверить ваучер <IconArrow />
+        <div className={`sf-menu-backdrop ${menuOpen ? 'is-open' : ''}`} onClick={closeMenu} aria-hidden="true" />
+        <aside id="sf-mobile-menu" className={`sf-mobile-menu ${menuOpen ? 'is-open' : ''}`} aria-hidden={!menuOpen}>
+          <div className="sf-mobile-menu-head">
+            <a href="#hero" className="sf-logo" onClick={handleNavClick}>
+              <span className="sf-logo-mark"><Icon name="plane" size={20} /></span>
+              <span>SkyFood</span>
+            </a>
+            <button type="button" className="sf-menu-close" onClick={closeMenu} aria-label="Закрыть меню">
+              <Icon name="close" size={21} />
             </button>
-
-            <div className="sf-hero-note">
-              ⚙ Без регистрации - код с посадочного талона
-            </div>
           </div>
-        </section>
+          <nav className="sf-mobile-nav" aria-label="Мобильная навигация">
+            {NAV_ITEMS.map(([label, href], index) => (
+              <a className={index === 0 ? 'is-active' : ''} href={href} key={href} onClick={handleNavClick}>
+                <span>{label}</span><Icon name="arrow" size={17} />
+              </a>
+            ))}
+          </nav>
+          <div className="sf-mobile-menu-note"><Icon name="heart" size={16} /> Забота в деталях — даже во время ожидания</div>
+        </aside>
 
-        {/* ОСНОВНЫЕ КАРТОЧКИ */}
-
-        <section className="sf-main-cards">
-
-          {/* ПРОВЕРКА ВАУЧЕРА */}
-
-          <article className="sf-card sf-check-card" id="check-section">
-
-            <div className="sf-card-heading">
-              <span className="sf-heading-icon">
-                <IconSearch />
-              </span>
-              <h2>Проверить ваучер</h2>
-            </div>
-
-            <form onSubmit={handleCheck} className="sf-check-form">
-              <input
-                type="text"
-                value={ticket}
-                onChange={(e) => {
-                  setTicket(e.target.value);
-
-                  if (e.target.value === '') {
-                    setData(null);
-                    setError('');
-                  }
-                }}
-                placeholder="Код талона"
-              />
-
-              <button type="submit" disabled={loading}>
-                {loading ? 'Проверяем...' : 'Проверить'}
+        <main>
+          <section className="sf-hero" id="hero">
+            <img className="sf-hero-image" src={coffeeImage} alt="Кофе и круассан у окна аэропорта" />
+            <div className="sf-hero-wash" />
+            <div className="sf-hero-content">
+              <div className="sf-eyebrow"><Icon name="sparkle" size={14} /> ЧУТЬ БОЛЬШЕ ЗАБОТЫ В ПУТИ</div>
+              <h1>SkyFood — вкусное решение при задержке рейса</h1>
+              <p>Пусть ожидание станет приятнее. Проверьте ваучер и обменяйте его на воду или обед в аэропорту.</p>
+              <button className="sf-primary-button" type="button" onClick={() => document.getElementById('check-section')?.scrollIntoView({ behavior: 'smooth' })}>
+                Проверить ваучер <Icon name="arrow" size={18} />
               </button>
-            </form>
-
-            {/* ОШИБКА: ТАЛОН НЕ НАЙДЕН */}
-
-            {error && (
-              <div className="sf-error-message">
-                <h3>Посадочный талон не найден</h3>
-                <p>
-                  Проверьте правильность введённого кода или
-                  попробуйте отсканировать посадочный талон ещё раз.
-                </p>
-              </div>
-            )}
-
-            {/* РЕЗУЛЬТАТ ПРОВЕРКИ */}
-
-            {data && (
-              <>
-                {/* АКТИВНЫЙ ВАУЧЕР */}
-
-                {data.status === 'Активен' && (
-                  <div className="sf-voucher-card">
-
-                    <div className="sf-voucher-header">
-                      <span>Ваш ваучер SkyFood</span>
-                      <span className="sf-voucher-status">
-                        {data.status}
-                      </span>
-                    </div>
-
-                    <div className="sf-voucher-body">
-                      <div className="sf-voucher-field">
-                        <span className="sf-field-label">Пассажир:</span>
-                        <span className="sf-field-value">
-                          {data.passengerName}
-                        </span>
-                      </div>
-
-                      <div className="sf-voucher-field">
-                        <span className="sf-field-label">Тип ваучера:</span>
-                        <span className="sf-field-value">
-                          {data.voucherType}
-                        </span>
-                      </div>
-
-                      <div className="sf-voucher-field">
-                        <span className="sf-field-label">
-                          Сумма текущего периода:
-                        </span>
-                        <span className="sf-field-value">
-                          {data.totalAmount} {data.currency}
-                        </span>
-                      </div>
-
-                      <div className="sf-voucher-field">
-                        <span className="sf-field-label">Статус:</span>
-                        <span className="sf-field-value">
-                          {data.status}
-                        </span>
-                      </div>
-                    </div>
-
-                    <div className="sf-voucher-balance-block">
-                      <span className="sf-balance-label">
-                        Доступный остаток:
-                      </span>
-                      <span className="sf-balance-value">
-                        {data.balance} {data.currency}
-                      </span>
-                    </div>
-
-                    <div className="sf-voucher-instruction">
-                      <p>
-                        Предъявите посадочный талон сотруднику
-                        участвующего в программе кафе. Сотрудник
-                        проверит ваш ваучер и поможет оформить покупку.
-                      </p>
-                    </div>
-
-                  </div>
-                )}
-
-                {/* ВАУЧЕР ПОКА НЕ ВЫДАН */}
-
-                {data.status === 'Не выдан' && (
-                  <div className="sf-state-card sf-state-pending">
-
-                    <div className="sf-state-top">
-                      <span className="sf-state-code">
-                        {ticket.trim()}
-                      </span>
-
-                      <span className="sf-state-badge">
-                        <span className="sf-state-small-icon">
-                          <IconStatusClock />
-                        </span>
-                        Не выдан
-                      </span>
-                    </div>
-
-                    <div className="sf-state-icon">
-                      <IconStatusClock />
-                    </div>
-
-                    <div className="sf-state-description">
-                      <h3>Ваучер пока недоступен</h3>
-
-                      <p>
-                        Посадочный талон найден, но ваучер ещё не выдан.
-                        Возможность его получения зависит от длительности
-                        задержки и решения авиакомпании.
-                      </p>
-                    </div>
-
-                    <div className="sf-state-note">
-                      <span className="sf-state-note-icon">
-                        <IconStatusInfo />
-                      </span>
-
-                      <p>
-                        Проверьте статус позже или уточните информацию
-                        у представителя авиакомпании.
-                      </p>
-                    </div>
-
-                  </div>
-                )}
-
-                {/* ВАУЧЕР ЗАКРЫТ */}
-
-                {data.status === 'Закрыт' && (
-                  <div className="sf-state-card sf-state-closed">
-
-                    <div className="sf-state-top">
-                      <span className="sf-state-code">
-                        {ticket.trim()}
-                      </span>
-
-                      <span className="sf-state-badge">
-                        <span className="sf-state-small-icon">
-                          <IconStatusLock />
-                        </span>
-                        Закрыт
-                      </span>
-                    </div>
-
-                    <div className="sf-state-icon">
-                      <IconStatusTicket />
-                    </div>
-
-                    <div className="sf-state-description">
-                      <h3>Ваучер больше не действует</h3>
-
-                      <p>
-                        Этот ваучер закрыт и больше не доступен для оплаты.
-                        Его действие завершено после посадки, отмены
-                        или вылета рейса.
-                      </p>
-                    </div>
-
-                    <div className="sf-state-note">
-                      <span className="sf-state-note-icon">
-                        <IconStatusInfo />
-                      </span>
-
-                      <p>
-                        Если вы считаете, что произошла ошибка,
-                        обратитесь в поддержку SkyFood.
-                      </p>
-                    </div>
-
-                  </div>
-                )}
-
-              </>
-            )}
-
-            {/* ПОДСКАЗКА С ПРИМЕРОМ ТАЛОНА */}
-
-            <div className="sf-hint-container">
-
-              <div className="sf-hint-left">
-                <div className="sf-mini-ticket-ui">
-                  <div className="sf-mt-top">
-                    <span>BOARDING PASS</span>
-                    <span>✈</span>
-                  </div>
-
-                  <div className="sf-mt-route">
-                    <span>SVO</span>
-                    <span>→</span>
-                    <span>LED</span>
-                  </div>
-
-                  <div className="sf-mt-gate">
-                    GATE 12 · SEAT 18A
-                  </div>
-                </div>
-
-                <div className="sf-hint-code">
-                  <span className="sf-hint-label">КОД ТАЛОНА</span>
-                  <span className="sf-hint-value">BP-XXXX-XX</span>
-                  <div className="sf-barcode"></div>
-                </div>
-              </div>
-
-              <div className="sf-hint-right">
-                <h4>Где найти код?</h4>
-
-                <p>
-                  Введите 8 символов с талона — как в выделенной
-                  части образца.
-                </p>
-
-                <p className="sf-hint-example">
-                  <IconTicket /> Пример: BP-1001-01 · латиницей
-                </p>
-
-                <div className="sf-test-codes">
-                  <strong>Тестовые коды (латиницей):</strong>
-                  <span>BP-1001-01 (активен)</span>
-                  <span>BP-1001-02 (не выдан)</span>
-                  <span>BP-1001-03 (закрыт)</span>
-                </div>
-              </div>
-
+              <div className="sf-hero-caption"><Icon name="shield" size={15} /> Без регистрации — код с посадочного талона</div>
             </div>
+          </section>
 
-            <div className="sf-bottom-note">
-              <IconTicket />
-              Если ваучер выдан для вашего рейса, здесь появятся
-              его условия и срок действия.
-            </div>
+          <section className="sf-main-grid" aria-label="Проверка ваучера и типы">
+            <article className="sf-panel sf-check-panel" id="check-section">
+              <div className="sf-panel-title"><Icon name="search" size={22} /><h2>Проверить ваучер</h2></div>
 
-          </article>
+              <form className="sf-check-form" onSubmit={handleCheck}>
+                <label className="sf-code-field">
+                  <span>Код талона</span>
+                  <div className="sf-input-wrap">
+                    <input
+                      type="text"
+                      value={ticket}
+                      onChange={event => {
+                        setTicket(event.target.value);
+                        setData(null);
+                        setError('');
+                      }}
+                      placeholder="BP-1001-01"
+                      autoComplete="off"
+                      spellCheck="false"
+                      aria-label="Код посадочного талона"
+                    />
+                    {ticket && (
+                      <button className="sf-clear-btn" type="button" onClick={handleClear} aria-label="Очистить код талона" title="Очистить">
+                        <Icon name="close" size={17} />
+                      </button>
+                    )}
+                    {!ticket && <Icon className="sf-input-ticket-icon" name="ticket" size={18} />}
+                  </div>
+                </label>
 
-          {/* ТИПЫ ВАУЧЕРОВ */}
-
-          <article className="sf-card sf-types-card">
-
-            <div className="sf-card-heading">
-              <h2>Типы ваучеров</h2>
-            </div>
-
-            <div className="sf-types">
-              <div className="sf-type">
-                <div className="sf-type-icon sf-water">
-                  <IconWater />
-                </div>
-                <div>
-                  <strong>WATER</strong>
-                  <p>Питьевая вода</p>
-                </div>
-              </div>
-
-              <div className="sf-type">
-                <div className="sf-type-icon sf-meal">
-                  <IconMeal />
-                </div>
-                <div>
-                  <strong>MEAL</strong>
-                  <p>Обед или перекус</p>
-                </div>
-              </div>
-            </div>
-
-            <div className="sf-types-note">
-              <span>
-                <IconRefresh />
-              </span>
-              Возможно пополнение ваучера при продолжительной задержке.
-            </div>
-
-          </article>
-
-        </section>
-
-        {/* КАФЕ */}
-
-        <section className="sf-info-section" id="cafes-list">
-
-          <div className="sf-section-label">ГДЕ ПОЛУЧИТЬ</div>
-
-          <h2 className="sf-info-title">
-            Где воспользоваться ваучером
-          </h2>
-
-          <p className="sf-info-subtitle">
-            Выберите аэропорт и удобное кафе для вашей паузы.
-          </p>
-
-          <div className="sf-filter-bar">
-
-            <div className="sf-filter-select">
-              <IconMapPin />
-
-              <select
-                value={selectedCity}
-                onChange={handleCityChange}
-              >
-                {CITIES.map(city => (
-                  <option key={city.name} value={city.name}>
-                    {city.name}
-                  </option>
-                ))}
-              </select>
-            </div>
-
-            <div className="sf-airport-buttons">
-              {availableAirports.map(airport => (
-                <button
-                  key={airport.code}
-                  className={
-                    selectedAirport === airport.code ? 'active' : ''
-                  }
-                  onClick={() => setSelectedAirport(airport.code)}
-                >
-                  {airport.code}
+                <button type="submit" className="sf-submit-button" disabled={loading || !ticket.trim()}>
+                  {loading ? <><span className="sf-button-spinner" /> Проверяем…</> : <>Проверить <Icon name="arrow" size={17} /></>}
                 </button>
+              </form>
+
+              {loading && <LoadingVoucher ticket={ticket.trim()} />}
+
+              {error && !loading && (
+                <section className="sf-state-card is-error" role="alert">
+                  <div className="sf-state-topline">
+                    <span className="sf-state-code">Код талона: {ticket.trim() || '—'}</span>
+                    <span className="sf-state-badge"><Icon name="search" size={14} /> Ошибка</span>
+                  </div>
+                  <div className="sf-state-icon">
+                    <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="10.8" cy="10.8" r="6.8"/><path d="m16 16 5 5M8.5 8.5l4.6 4.6m0-4.6-4.6 4.6"/></svg>
+                  </div>
+                  <div className="sf-state-copy">
+                    <h3>Посадочный талон не найден</h3>
+                    <p>{error}</p>
+                  </div>
+                  <div className="sf-state-note"><Icon name="info" size={19} /><span>Проверьте правильность кода и попробуйте ещё раз позднее.</span></div>
+                </section>
+              )}
+
+              {data && !loading && isActive && (
+                <div className="sf-voucher-result">
+                  <div className="sf-voucher-result-head">
+                    <strong>Ваш ваучер SkyFood</strong>
+                    <span className="sf-status-pill"><i />{data.status}</span>
+                  </div>
+                  <div className="sf-voucher-details">
+                    <div><span>Пассажир:</span><strong>{data.passengerName || 'Не указан'}</strong></div>
+                    <div><span>Тип ваучера:</span><strong>{data.voucherType || 'Не указан'}</strong></div>
+                    <div><span>Сумма текущего периода:</span><strong>{data.totalAmount ?? '—'} {data.currency || ''}</strong></div>
+                    <div><span>Статус:</span><strong className="sf-active-text">{data.status}</strong></div>
+                    <div className="sf-balance-row"><span>Доступный остаток:</span><strong>{data.balance ?? '—'} {data.currency || ''}</strong></div>
+                  </div>
+                  <p className="sf-voucher-instruction">Предъявите посадочный талон сотруднику участвующего в программе кафе. Сотрудник проверит ваш ваучер и поможет оформить покупку.</p>
+                </div>
+              )}
+
+              {data && !loading && isNotIssued && (
+                <section className="sf-state-card is-pending" role="status">
+                  <div className="sf-state-topline">
+                    <span className="sf-state-code">{ticket.trim()}</span>
+                    <span className="sf-state-badge"><Icon name="clock" size={14} /> Не выдан</span>
+                  </div>
+                  <div className="sf-state-icon"><Icon name="clock" size={29} /></div>
+                  <div className="sf-state-copy">
+                    <h3>Ваучер пока недоступен</h3>
+                    <p>По вашему посадочному талону пока нет доступного ваучера SkyFood. Если ваш рейс задержан, проверьте информацию позднее.</p>
+                  </div>
+                  <div className="sf-state-note"><Icon name="info" size={19} /><span>Если рейс задержан, попробуйте проверить наличие ваучера немного позже.</span></div>
+                </section>
+              )}
+
+              {data && !loading && isClosed && (
+                <section className="sf-state-card is-closed" role="status">
+                  <div className="sf-state-topline">
+                    <span className="sf-state-code">{ticket.trim()}</span>
+                    <span className="sf-state-badge"><Icon name="shield" size={14} /> Закрыт</span>
+                  </div>
+                  <div className="sf-state-icon">
+                    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 8h14v12H5zM8 8V6a4 4 0 0 1 8 0v2"/><path d="m9 12 6 5m0-5-6 5"/></svg>
+                  </div>
+                  <div className="sf-state-copy">
+                    <h3>Ваучер больше не действует</h3>
+                    <p>Ваучер закрыт. Его использование для новых покупок недоступно.</p>
+                  </div>
+                  <div className="sf-state-note"><Icon name="info" size={19} /><span>После закрытия ваучера новые покупки невозможны.</span></div>
+                </section>
+              )}
+
+              {data && !loading && isUnknownStatus && (
+                <section className="sf-state-card is-error" role="alert">
+                  <div className="sf-state-topline">
+                    <span className="sf-state-code">{ticket.trim()}</span>
+                    <span className="sf-state-badge"><Icon name="search" size={14} /> Ошибка</span>
+                  </div>
+                  <div className="sf-state-icon"><Icon name="search" size={29} /></div>
+                  <div className="sf-state-copy">
+                    <h3>Не удалось определить статус ваучера</h3>
+                    <p>Получен неизвестный статус: {status || 'не указан'}. Обратитесь к представителю авиакомпании или повторите проверку позднее.</p>
+                  </div>
+                  <div className="sf-state-note"><Icon name="info" size={19} /><span>Если проблема повторяется, обратитесь в службу поддержки.</span></div>
+                </section>
+              )}
+
+              <div className="sf-hint-panel">
+                <BoardingPass />
+                <div className="sf-hint-copy">
+                  <h3>Где найти код?</h3>
+                  <p>Введите код с посадочного талона — он находится в выделённой части образца.</p>
+                  <div className="sf-hint-example"><Icon name="ticket" size={14} /> BP-1001-01 · латиницей</div>
+                </div>
+              </div>
+
+              <div className="sf-test-codes">
+                <span>Попробуйте на примере:</span>
+                <div><code>BP-1001-01</code> — активен <b>·</b> <code>BP-1001-02</code> — не выдан <b>·</b> <code>BP-1001-03</code> — закрыт</div>
+              </div>
+              <p className="sf-check-footnote">Уточните использование ваучера перед покупкой непосредственно в кафе.</p>
+            </article>
+
+            <article className="sf-panel sf-types-panel">
+              <div className="sf-panel-title"><h2>Типы ваучеров</h2></div>
+              <div className="sf-type-options">
+                <div className="sf-type-option"><span className="sf-type-icon"><Icon name="water" size={24} /></span><strong>WATER</strong><p>Питьевая вода</p></div>
+                <div className="sf-type-option"><span className="sf-type-icon"><Icon name="meal" size={24} /></span><strong>MEAL</strong><p>Обед или перекус</p></div>
+              </div>
+              <div className="sf-types-note"><Icon name="refresh" size={17} /><span>Возможно пополнение ваучера при продолжительной задержке.</span></div>
+            </article>
+          </section>
+
+          <section className="sf-cafes-panel" id="cafes-list">
+            <div className="sf-section-heading"><h2>Где воспользоваться ваучером</h2></div>
+            <div className="sf-filter-bar">
+              <label className="sf-city-select">
+                <span className="sf-sr-only">Выберите город</span>
+                <select value={selectedCity} onChange={handleCityChange}>
+                  {CITIES.map(city => <option key={city.name} value={city.name}>{city.name}</option>)}
+                </select>
+                <span className="sf-select-chevron">⌄</span>
+              </label>
+              <div className="sf-airport-buttons">
+                {availableAirports.map(airport => (
+                  <button type="button" key={airport.code} className={selectedAirport === airport.code ? 'is-selected' : ''} onClick={() => setSelectedAirport(airport.code)}>{airport.code}</button>
+                ))}
+              </div>
+              <span className="sf-cafe-count">{filteredCafes.length} кафе</span>
+            </div>
+
+            <div className="sf-cafes-grid">
+              {filteredCafes.map(cafe => (
+                <article className="sf-cafe-card" key={cafe.id}>
+                  <div className="sf-cafe-image"><img src={cafe.image} alt={`Фото кафе ${cafe.name}`} /><span>{cafe.category}</span></div>
+                  <div className="sf-cafe-info">
+                    <div className="sf-cafe-title-row"><h3>{cafe.name}</h3><a href="#rules" aria-label={`Как воспользоваться ваучером в кафе ${cafe.name}`}><Icon name="external" size={16} /></a></div>
+                    <p className="sf-cafe-terminal">{cafe.airport} · Терминал {cafe.terminal}</p>
+                    <p className="sf-cafe-zone"><Icon name="pin" size={12} /> {cafe.zone}</p>
+                  </div>
+                </article>
               ))}
             </div>
+            <div className="sf-info-strip"><Icon name="info" size={15} /> Кафе и расположение показаны для примера. Доступные точки будут указаны после проверки ваучера.</div>
+          </section>
 
-            <div className="sf-filter-count">
-              {filteredCafes.length} кафе
+          <section className="sf-how-section" id="how">
+            <h2>Как это работает</h2>
+            <div className="sf-how-grid">
+              <article className="sf-how-card"><div className="sf-how-top"><span>01</span><Icon name="ticket" size={18} /></div><h3>Проверьте ваучер</h3><p>Введите код с посадочного талона. Узнайте тип ваучера и до какого времени он действует.</p></article>
+              <article className="sf-how-card"><div className="sf-how-top"><span>02</span><Icon name="meal" size={18} /></div><h3>Выберите кафе</h3><p>Найдите подходящее заведение в вашем терминале. Уточните, находится ли оно после досмотра.</p></article>
+              <article className="sf-how-card"><div className="sf-how-top"><span>03</span><Icon name="clock" size={18} /></div><h3>Наслаждайтесь паузой</h3><p>Покажите ваучер сотруднику перед заказом. Возьмите воду или перекус и отдохните.</p></article>
             </div>
+          </section>
 
-          </div>
-
-          <div className="sf-cafes-grid-new">
-            {filteredCafes.map(cafe => (
-              <div key={cafe.id} className="sf-cafe-new-card">
-
-                <div className="sf-cafe-new-image">
-                  <img src={cafe.img} alt={cafe.name} />
-                  <span className="sf-cafe-new-tag">
-                    {cafe.category}
-                  </span>
-                </div>
-
-                <div className="sf-cafe-new-content">
-
-                  <div className="sf-cafe-new-header">
-                    <h3>{cafe.name}</h3>
-                    <a href="#rules" className="sf-cafe-new-arrow">
-                      <IconArrowUpRight />
-                    </a>
-                  </div>
-
-                  <p className="sf-cafe-new-location">
-                    <IconMapPin />
-                    {cafe.airport} · Терминал {cafe.terminal}
-                  </p>
-
-                  <p className="sf-cafe-new-zone">
-                    {cafe.zone}
-                  </p>
-
-                </div>
-              </div>
-            ))}
-          </div>
-
-          <div className="sf-info-footer" style={{ marginTop: '20px' }}>
-            ⓘ Кафе и расположение показаны для примера. Доступные точки
-            будут указаны после проверки ваучера.
-          </div>
-
-        </section>
-
-        {/* КАК ЭТО РАБОТАЕТ */}
-
-        <section className="sf-how-section" id="how">
-
-          <div className="sf-section-label">ВСЁ ПРОСТО</div>
-
-          <h2 className="sf-info-title">Как это работает</h2>
-
-          <div className="sf-how-grid">
-
-            <div className="sf-how-step">
-              <div className="sf-how-number">1</div>
-              <h3>Проверьте ваучер</h3>
-              <p>
-                Введите код с посадочного талона. Узнайте тип ваучера
-                и до какого времени он действует.
-              </p>
+          <section className="sf-rules-panel" id="rules">
+            <h2>Правила использования</h2>
+            <div className="sf-rules-grid">
+              {RULES.map(rule => (
+                <article className="sf-rule" key={rule.title}>
+                  <span className="sf-rule-icon"><Icon name={rule.icon} size={17} /></span>
+                  <div><h3>{rule.title}</h3><p>{rule.text}</p></div>
+                </article>
+              ))}
             </div>
+            <div className="sf-important-note"><Icon name="info" size={16} /><p><strong>Особое внимание:</strong> Размер ваучера зависит от авиакомпании. Список разрешённых товаров зависит от типа ваучера. При начале посадки, отмене или вылете рейса ваучер закрывается. После закрытия ваучера новые покупки невозможны.</p></div>
+            <p className="sf-rules-caption">Немного деталей, чтобы всё прошло легко. Точные условия указаны в вашем ваучере.</p>
+          </section>
 
-            <div className="sf-how-step">
-              <div className="sf-how-number">2</div>
-              <h3>Выберите кафе</h3>
-              <p>
-                Найдите подходящее заведение в вашем терминале.
-                Уточните, находится ли оно после досмотра.
-              </p>
+          <footer className="sf-footer" id="contacts">
+            <h2>Контакты</h2>
+            <p className="sf-footer-intro">Нужна помощь с ваучером? Мы рядом, чтобы ваша пауза в аэропорту прошла спокойнее.</p>
+            <div className="sf-contact-grid">
+              <div className="sf-contact-item"><span className="sf-contact-icon"><Icon name="mail" size={18} /></span><div><small>Электронная почта</small><a href="mailto:support@skyfood.example">support@skyfood.example</a></div></div>
+              <div className="sf-contact-item"><span className="sf-contact-icon"><Icon name="phone" size={18} /></span><div><small>Телефон</small><a href="tel:88000000000">8 800 000-00-00</a></div></div>
+              <div className="sf-contact-item"><span className="sf-contact-icon"><Icon name="clock" size={18} /></span><div><small>Время работы</small><strong>Ежедневно, 08:00–22:00 МСК</strong></div></div>
             </div>
-
-            <div className="sf-how-step">
-              <div className="sf-how-number">3</div>
-              <h3>Наслаждайтесь паузой</h3>
-              <p>
-                Покажите ваучер сотруднику перед заказом. Возьмите
-                воду или перекус и отдохните.
-              </p>
+            <div className="sf-footer-bar">
+              <span>© 2026 SkyFood. С заботой о пути.</span>
+              <div><span><Icon name="shield" size={13} /> Бережно к данным</span><span><Icon name="ticket" size={13} /> Время для паузы</span><span><Icon name="heart" size={13} /> Забота в деталях</span></div>
             </div>
-
-          </div>
-
-        </section>
-
-        {/* ПРАВИЛА */}
-
-        <section className="sf-info-section" id="rules">
-
-          <div className="sf-section-label">
-            ПОЛЕЗНО ЗНАТЬ ЗАРАНЕЕ
-          </div>
-
-          <h2 className="sf-info-title">
-            Правила использования
-          </h2>
-
-          <p className="sf-info-subtitle">
-            Немного деталей, чтобы всё прошло легко.
-            Точные условия указаны в вашем ваучере.
-          </p>
-
-          <div className="sf-info-grid">
-
-            <div className="sf-rule-item">
-              <div className="sf-rule-icon">
-                <IconTicket />
-              </div>
-              <div>
-                <strong>При каких условиях предоставляется</strong>
-                <p>
-                  Ваучер предоставляется пассажирам при задержке рейса,
-                  если авиакомпания участвует в программе SkyFood.
-                </p>
-              </div>
-            </div>
-
-            <div className="sf-rule-item">
-              <div className="sf-rule-icon">
-                <IconRefresh />
-              </div>
-              <div>
-                <strong>Какие виды существуют</strong>
-                <p>
-                  Программа предусматривает два типа: WATER (вода)
-                  и MEAL (питание).
-                </p>
-              </div>
-            </div>
-
-            <div className="sf-rule-item">
-              <div className="sf-rule-icon">
-                <IconWater />
-              </div>
-              <div>
-                <strong>Чем отличаются WATER и MEAL</strong>
-                <p>
-                  WATER предоставляется при меньшем времени задержки
-                  и предназначен для покупки воды. MEAL — при более
-                  длительном ожидании, для питания.
-                </p>
-              </div>
-            </div>
-
-            <div className="sf-rule-item">
-              <div className="sf-rule-icon">
-                <IconSearch />
-              </div>
-              <div>
-                <strong>Как проверить наличие</strong>
-                <p>
-                  Введите код посадочного талона в разделе
-                  «Проверить ваучер» на этой странице.
-                </p>
-              </div>
-            </div>
-
-            <div className="sf-rule-item">
-              <div className="sf-rule-icon">
-                <IconMeal />
-              </div>
-              <div>
-                <strong>Как воспользоваться в кафе</strong>
-                <p>
-                  Предъявите посадочный талон сотруднику кафе-партнёра.
-                  Он проверит ваучер и поможет оформить заказ.
-                </p>
-              </div>
-            </div>
-
-            <div className="sf-rule-item">
-              <div className="sf-rule-icon">
-                <IconShield />
-              </div>
-              <div>
-                <strong>Можно ли использовать несколько раз</strong>
-                <p>
-                  Да, ваучер можно использовать до тех пор,
-                  пока на нём есть остаток средств.
-                </p>
-              </div>
-            </div>
-
-            <div className="sf-rule-item">
-              <div className="sf-rule-icon">
-                <IconClock />
-              </div>
-              <div>
-                <strong>Когда ваучер перестаёт действовать</strong>
-                <p>
-                  При начале посадки, отмене или вылете рейса ваучер
-                  закрывается. После закрытия новые покупки невозможны.
-                </p>
-              </div>
-            </div>
-
-            <div className="sf-rule-item">
-              <div className="sf-rule-icon">
-                <IconBag />
-              </div>
-              <div>
-                <strong>Что можно купить</strong>
-                <p>
-                  Разрешённые продукты и напитки. Спиртные напитки
-                  и табачные изделия приобрести нельзя.
-                </p>
-              </div>
-            </div>
-
-          </div>
-
-          <div className="sf-info-footer" style={{ marginTop: '20px' }}>
-            <strong>Особое внимание:</strong> Размер ваучера зависит
-            от авиакомпании. Список разрешённых товаров зависит от типа
-            ваучера. При начале посадки, отмене или вылете рейса ваучер
-            закрывается. После закрытия ваучера новые покупки невозможны.
-          </div>
-
-        </section>
-
-        {/* КОНТАКТЫ И ПОДВАЛ */}
-
-        <section className="sf-info-section" id="contacts">
-
-          <div className="sf-contacts-grid">
-
-            <div>
-              <h2 className="sf-info-title">Контакты</h2>
-              <p>
-                Нужна помощь с ваучером? Мы рядом, чтобы ваша пауза
-                в аэропорту прошла спокойнее.
-              </p>
-            </div>
-
-            <div className="sf-contact-block">
-              <IconMail />
-              <div>
-                <strong>support@skyfood.example</strong>
-                <span>Для вопросов о ваучерах</span>
-              </div>
-            </div>
-
-            <div className="sf-contact-block">
-              <IconPhone />
-              <div>
-                <strong>8 800 000-00-00</strong>
-                <span>Ежедневно · 08:00–22:00 МСК</span>
-              </div>
-            </div>
-
-          </div>
-
-          <div className="sf-footer-bar">
-
-            <div className="sf-footer-left">
-              © 2026 SkyFood. С заботой о пути.
-            </div>
-
-            <div className="sf-footer-right">
-              <span>
-                <IconShield /> Бережно к данным
-              </span>
-              <span>
-                <IconCafe /> Время для паузы
-              </span>
-              <span>
-                <IconHeart /> Забота в деталях
-              </span>
-            </div>
-
-          </div>
-
-          <div className="sf-footer-legal">
-            Иллюстративный макет сервиса. Контакты и заведения приведены
-            в качестве примера; партнёрства с авиакомпаниями не заявляются.
-          </div>
-
-        </section>
-
-      </main>
+            <p className="sf-legal">Иллюстративный макет сервиса. Контакты и заведения приведены в качестве примера; партнёрства с авиакомпаниями не заявляются.</p>
+          </footer>
+        </main>
+      </div>
     </div>
   );
 }
