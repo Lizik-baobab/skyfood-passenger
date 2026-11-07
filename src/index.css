@@ -206,20 +206,75 @@ button { cursor: pointer; }
 
 /* ================= МОБИЛЬНАЯ ВЕРСИЯ ================= */
 @media (max-width: 1024px) {
-  .sf-hero { height: auto; padding-bottom: 0; }
-  .sf-hero-image { position: relative; height: 300px; }
-  .sf-hero-overlay { display: none; }
-  .sf-hero-content { padding: 30px 20px; max-width: 100%; }
-  .sf-hero h1 { font-size: 32px; }
-  .sf-main-cards { grid-template-columns: 1fr; margin-top: 20px; }
-  .sf-cafes-grid-new { grid-template-columns: 1fr 1fr; }
-  .sf-how-grid { grid-template-columns: 1fr; }
-  .sf-info-grid { grid-template-columns: 1fr; }
-  .sf-contacts-grid { grid-template-columns: 1fr; gap: 20px; }
-  .sf-footer-bar { flex-direction: column; gap: 20px; text-align: center; }
-  .sf-footer-right { flex-direction: column; gap: 10px; }
-  .sf-filter-bar { flex-direction: column; align-items: stretch; }
-  .sf-filter-count { margin-left: 0; text-align: right; }
+   /* ГЛАВНЫЙ ЭКРАН (КРЕМОВЫЙ ВЕРХ + КАРТИНКА СНИЗУ) */
+  .sf-hero {
+    position: relative;
+    height: auto; 
+    width: 100%;
+    border-radius: 0;
+    margin: 0;
+    background: #FFF4E8; /* Кремовый фон */
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+
+  .sf-hero-content {
+    position: relative;
+    z-index: 3;
+    padding: 40px 20px 20px;
+    width: 100%;
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .sf-hero h1 { font-size: 32px; line-height: 1.1; margin-bottom: 15px; }
+  .sf-hero p { font-size: 14px; margin-bottom: 25px; }
+  
+  .sf-primary-button { 
+    width: 100%; 
+    max-width: 100%; 
+    margin-top: 0; 
+    margin-bottom: 15px; 
+  }
+  .sf-hero-note { 
+    display: flex; 
+    justify-content: center;
+    margin-bottom: 20px;
+    color: #526782;
+  }
+
+  /* Картинка снизу с переходом */
+  .sf-hero-image {
+    position: relative;
+    width: 100%;
+    height: 350px; /* Высота картинки */
+    z-index: 1;
+    order: 2; /* Ставим картинку после текста */
+  }
+  
+  .sf-hero-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center;
+  }
+
+  /* Градиентный переход от кремового фона к картинке */
+  .sf-hero-image::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 80px; /* Высота перехода */
+    background: linear-gradient(180deg, #FFF4E8 0%, rgba(255, 244, 232, 0) 100%);
+    z-index: 2;
+    pointer-events: none;
+  }
+
+  .sf-hero-overlay {
+    display: none; /* Старый оверлей больше не нужен */
+  }
 }
 
 @media (max-width: 768px) {
@@ -275,8 +330,33 @@ button { cursor: pointer; }
 
   /* КАФЕ: ВЫБОР ГОРОДА */
   .sf-filter-bar { flex-direction: column; align-items: stretch; gap: 10px; }
-  .sf-filter-select { width: 100%; justify-content: flex-start; gap: 10px; padding: 12px 16px; display: flex; align-items: center; }
-  .sf-filter-select select { flex: none; width: auto; text-align: left; padding: 0; }
+    .sf-filter-select { 
+    width: 100%; 
+    justify-content: flex-start;
+    gap: 10px;
+    padding: 12px 16px;
+    position: relative;
+  }
+  .sf-filter-select select {
+    flex: 1;
+    text-align: left;
+    appearance: none; /* Убираем стандартную стрелку браузера */
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    background: transparent;
+    padding-right: 20px; /* Место под стрелку */
+  }
+  /* Добавляем свою стрелку справа */
+  .sf-filter-select::after {
+    content: '▾';
+    position: absolute;
+    right: 16px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--navy);
+    pointer-events: none;
+    font-size: 14px;
+  }
   .sf-filter-count { margin-left: 0; text-align: right; }
   .sf-cafes-grid-new { grid-template-columns: 1fr; }
   .sf-cafe-new-card { width: 100%; box-sizing: border-box; }
