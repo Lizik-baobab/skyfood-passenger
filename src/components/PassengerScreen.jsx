@@ -45,7 +45,7 @@ export default function PassengerScreen() {
   const [error, setError] = useState('');
   const [selectedCity, setSelectedCity] = useState('Москва');
   const [selectedAirport, setSelectedAirport] = useState('SVO');
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   const handleCheck = async (e) => {
     e.preventDefault();
@@ -77,30 +77,28 @@ export default function PassengerScreen() {
   return (
     <div className="skyfood-page">
       <header className="sf-header">
-        <a href="#hero" className="sf-logo">
-          <span className="sf-logo-icon">✈</span> 
-          <span>Sky<span style={{ color: 'var(--blue)' }}>Food</span></span>
-        </a>
-        <button className="sf-burger" onClick={() => setIsMenuOpen(!isMenuOpen)}>
-          <span></span><span></span><span></span>
+        <a href="#hero" className="sf-logo"><span className="sf-logo-icon">✈</span> <span>Sky<span style={{ color: 'var(--blue)' }}>Food</span></span></a>
+        
+        <button className="sf-burger" onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}>
+          ☰
         </button>
-        <nav className={`sf-nav ${isMenuOpen ? 'sf-nav--open' : ''}`}>
-          <a href="#hero" onClick={() => setIsMenuOpen(false)}>Главная</a>
-          <a href="#how" onClick={() => setIsMenuOpen(false)}>Как работает</a>
-          <a href="#check-section" onClick={() => setIsMenuOpen(false)}>Проверить</a>
-          <a href="#cafes-list" onClick={() => setIsMenuOpen(false)}>Где воспользоваться</a>
-          <a href="#rules" onClick={() => setIsMenuOpen(false)}>Правила</a>
-          <a href="#contacts" onClick={() => setIsMenuOpen(false)}>Контакты</a>
+
+        <nav className={`sf-nav ${isMobileMenuOpen ? 'sf-nav-open' : ''}`}>
+          <a href="#hero" onClick={() => setIsMobileMenuOpen(false)}>Главная</a>
+          <a href="#how" onClick={() => setIsMobileMenuOpen(false)}>Как работает</a>
+          <a href="#check-section" onClick={() => setIsMobileMenuOpen(false)}>Проверить</a>
+          <a href="#cafes-list" onClick={() => setIsMobileMenuOpen(false)}>Где воспользоваться</a>
+          <a href="#rules" onClick={() => setIsMobileMenuOpen(false)}>Правила</a>
+          <a href="#contacts" onClick={() => setIsMobileMenuOpen(false)}>Контакты</a>
         </nav>
       </header>
 
       <main>
-        {/* HERO (БЕЗ ГРАДИЕНТА, ТЕКСТ С ТЕНЬЮ) */}
         <section className="sf-hero" id="hero">
           <div className="sf-hero-image">
             <img src={coffeeImage} alt="Кофе и круассан" />
           </div>
-           <div className="sf-hero-overlay"></div>
+          <div className="sf-hero-overlay"></div>
           <div className="sf-hero-content">
             <div className="sf-badge">✈ ЧУТЬ БОЛЬШЕ ЗАБОТЫ В ПУТИ</div>
             <h1>SkyFood — вкусное решение при задержке рейса</h1>
@@ -114,25 +112,11 @@ export default function PassengerScreen() {
 
         <section className="sf-main-cards">
           <article className="sf-card sf-check-card" id="check-section">
-            <div className="sf-card-heading">
-              <span className="sf-heading-icon"><IconSearch /></span>
-              <h2>Проверить ваучер</h2>
-            </div>
-
+            <div className="sf-card-heading"><span className="sf-heading-icon"><IconSearch /></span><h2>Проверить ваучер</h2></div>
             <form onSubmit={handleCheck} className="sf-check-form">
-  <input 
-    type="text" 
-    value={ticket} 
-    onChange={(e) => {
-      setTicket(e.target.value);
-      if (e.target.value.trim() === '') { setData(null); setError(''); }
-    }} 
-    placeholder="Код талона (латиницей)" 
-  />
-  <button type="submit" disabled={loading}>
-    {loading ? 'Проверяем...' : 'Проверить'}
-  </button>
-</form>
+              <input type="text" value={ticket} onChange={(e) => setTicket(e.target.value)} placeholder="Код талона" />
+              <button type="submit" disabled={loading}>{loading ? 'Проверяем...' : 'Проверить'}</button>
+            </form>
             
             {error && <div className="sf-error-message"><h3>Посадочный талон не найден</h3><p>Проверьте правильность введённого кода или попробуйте отсканировать посадочный талон ещё раз.</p></div>}
             
@@ -151,11 +135,17 @@ export default function PassengerScreen() {
                       <span className="sf-balance-label">Доступный остаток:</span>
                       <span className="sf-balance-value">{data.balance} {data.currency}</span>
                     </div>
-                    <div className="sf-voucher-instruction"><p>Предъявите посадочный талон сотруднику участвующего в программе кафе. Сотрудник проверит ваш ваучер и поможет оформить покупку.</p></div>
+                    <div className="sf-voucher-instruction">
+                      <p>Предъявите посадочный талон сотруднику участвующего в программе кафе. Сотрудник проверит ваш ваучер и поможет оформить покупку.</p>
+                    </div>
                   </div>
                 )}
-                {data.status === 'Не выдан' && <div className="sf-info-message"><h3>Ваучер пока недоступен</h3><p>По вашему посадочному талону пока нет доступного ваучера SkyFood. Если ваш рейс задержан, проверьте информацию позднее.</p></div>}
-                {data.status === 'Закрыт' && <div className="sf-error-message"><h3>Ваучер больше не действует</h3><p>Ваучер закрыт. Его использование для новых покупок недоступно.</p></div>}
+                {data.status === 'Не выдан' && (
+                  <div className="sf-info-message"><h3>Ваучер пока недоступен</h3><p>По вашему посадочному талону пока нет доступного ваучера SkyFood. Если ваш рейс задержан, проверьте информацию позднее.</p></div>
+                )}
+                {data.status === 'Закрыт' && (
+                  <div className="sf-error-message"><h3>Ваучер больше не действует</h3><p>Ваучер закрыт. Его использование для новых покупок недоступно.</p></div>
+                )}
               </>
             )}
 
@@ -168,7 +158,7 @@ export default function PassengerScreen() {
                 </div>
                 <div className="sf-hint-code">
                   <span className="sf-hint-label">КОД ТАЛОНА</span>
-                  <span className="sf-hint-value">BP-ХХХХ-ХХ</span>
+                  <span className="sf-hint-value">BP-1001-01</span>
                   <div className="sf-barcode"></div>
                 </div>
               </div>
@@ -184,10 +174,7 @@ export default function PassengerScreen() {
                 </div>
               </div>
             </div>
-
-            <div className="sf-bottom-note">
-              <IconTicket /> Если ваучер выдан для вашего рейса, здесь появятся его условия и срок действия.
-            </div>
+            <div className="sf-bottom-note"><IconTicket /> Если ваучер выдан для вашего рейса, здесь появятся его условия и срок действия.</div>
           </article>
 
           <article className="sf-card sf-types-card">
@@ -204,7 +191,6 @@ export default function PassengerScreen() {
           <div className="sf-section-label">ГДЕ ПОЛУЧИТЬ</div>
           <h2 className="sf-info-title">Где воспользоваться ваучером</h2>
           <p className="sf-info-subtitle">Выберите аэропорт и удобное кафе для вашей паузы.</p>
-          
           <div className="sf-filter-bar">
             <div className="sf-filter-select">
               <IconMapPin /> 
@@ -221,7 +207,6 @@ export default function PassengerScreen() {
             </div>
             <div className="sf-filter-count">{filteredCafes.length} кафе</div>
           </div>
-
           <div className="sf-cafes-grid-new">
             {filteredCafes.map(cafe => (
               <div key={cafe.id} className="sf-cafe-new-card">
@@ -266,7 +251,9 @@ export default function PassengerScreen() {
             <div className="sf-rule-item"><div className="sf-rule-icon"><IconClock /></div><div><strong>Когда ваучер перестаёт действовать</strong><p>При начале посадки, отмене или вылете рейса ваучер закрывается. После закрытия новые покупки невозможны.</p></div></div>
             <div className="sf-rule-item"><div className="sf-rule-icon"><IconBag /></div><div><strong>Что можно купить</strong><p>Разрешённые продукты и напитки. Спиртные напитки и табачные изделия приобрести нельзя.</p></div></div>
           </div>
-          <div className="sf-info-footer"><strong>Особое внимание:</strong> Размер ваучера зависит от авиакомпании. Список разрешённых товаров зависит от типа ваучера. При начале посадки, отмене или вылете рейса ваучер закрывается. После закрытия ваучера новые покупки невозможны.</div>
+          <div className="sf-info-footer" style={{ marginTop: '20px' }}>
+            <strong>Особое внимание:</strong> Размер ваучера зависит от авиакомпании. Список разрешённых товаров зависит от типа ваучера. При начале посадки, отмене или вылете рейса ваучер закрывается. После закрытия ваучера новые покупки невозможны.
+          </div>
         </section>
 
         <section className="sf-info-section" id="contacts">
