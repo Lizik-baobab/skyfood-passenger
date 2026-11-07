@@ -120,9 +120,19 @@ export default function PassengerScreen() {
             </div>
 
             <form onSubmit={handleCheck} className="sf-check-form">
-              <input type="text" value={ticket} onChange={(e) => setTicket(e.target.value)} placeholder="Код талона" />
-              <button type="submit" disabled={loading}>{loading ? 'Проверяем...' : 'Проверить'}</button>
-            </form>
+  <input 
+    type="text" 
+    value={ticket} 
+    onChange={(e) => {
+      setTicket(e.target.value);
+      if (e.target.value.trim() === '') { setData(null); setError(''); }
+    }} 
+    placeholder="Код талона (латиницей)" 
+  />
+  <button type="submit" disabled={loading}>
+    {loading ? 'Проверяем...' : 'Проверить'}
+  </button>
+</form>
             
             {error && <div className="sf-error-message"><h3>Посадочный талон не найден</h3><p>Проверьте правильность введённого кода или попробуйте отсканировать посадочный талон ещё раз.</p></div>}
             

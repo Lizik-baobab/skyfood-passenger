@@ -284,19 +284,26 @@ button { cursor: pointer; }
 }
 
 @media (max-width: 768px) {
-  /* Глобальные правила */
   .skyfood-page { padding: 0 !important; overflow-x: hidden; width: 100%; }
   body { overflow-x: hidden; }
 
-  /* Шапка */
+  /* Шапка с бургером */
   .sf-header { padding: 15px 20px; flex-direction: row; justify-content: space-between; align-items: center; background: #fff; border-bottom: 1px solid #EAF3FF; }
   .sf-logo { font-size: 22px; }
-  .sf-nav { display: none; } /* Скрываем меню, как на референсе (бургер можно добавить позже) */
+  .sf-nav { display: none; } /* Скрываем ссылки */
+  
+  /* Добавляем иконку бургера (если её нет в коде, она появится через CSS) */
+  .sf-header::after {
+    content: '☰';
+    font-size: 28px;
+    color: var(--navy);
+    cursor: pointer;
+  }
 
-  /* ГЛАВНЫЙ ЭКРАН (КАРТИНКА НА ВЕСЬ БЛОК) */
+  /* ГЛАВНЫЙ ЭКРАН */
   .sf-hero {
     position: relative;
-    height: 520px; /* Высота под мобильный экран */
+    height: 500px;
     border-radius: 0;
     margin: 0;
     overflow: hidden;
@@ -310,15 +317,15 @@ button { cursor: pointer; }
     width: 100%;
     height: 100%;
     object-fit: cover;
-    object-position: center; /* Центрируем картинку */
+    object-position: center;
   }
-  /* Градиент снизу вверх, чтобы текст читался */
+  /* Градиент только для читаемости текста */
   .sf-hero-overlay {
     display: block;
     position: absolute;
     inset: 0;
     z-index: 2;
-    background: linear-gradient(180deg, rgba(255, 244, 232, 0.9) 0%, rgba(255, 244, 232, 0.6) 40%, transparent 100%);
+    background: linear-gradient(180deg, rgba(255, 244, 232, 0.9) 0%, rgba(255, 244, 232, 0.4) 50%, transparent 100%);
   }
   .sf-hero-content {
     position: absolute;
@@ -329,12 +336,12 @@ button { cursor: pointer; }
     display: flex;
     flex-direction: column;
     justify-content: flex-start;
-    padding-top: 60px; /* Отступ сверху, чтобы текст не прилипал к шапке */
+    padding-top: 40px;
   }
-  .sf-hero h1 { font-size: 32px; line-height: 1.1; margin-bottom: 15px; }
+  .sf-hero h1 { font-size: 30px; line-height: 1.1; margin-bottom: 15px; }
   .sf-hero p { font-size: 14px; margin-bottom: 25px; }
-  .sf-primary-button { width: 100%; max-width: 100%; align-self: stretch; margin-top: auto; margin-bottom: 30px; }
-  .sf-hero-note { display: none; } /* Скрываем мелкий текст на телефоне */
+  .sf-primary-button { width: 100%; max-width: 100%; align-self: stretch; margin-top: auto; margin-bottom: 20px; }
+  .sf-hero-note { display: none; }
 
   /* Карточки */
   .sf-main-cards { padding: 15px !important; margin-top: -20px !important; width: 100%; display: flex; flex-direction: column; gap: 15px; position: relative; z-index: 10; }
@@ -342,8 +349,17 @@ button { cursor: pointer; }
   .sf-info-section, .sf-how-section { width: 100% !important; margin: 15px 0 !important; padding: 20px !important; border-radius: 0 !important; box-sizing: border-box; }
 
   /* Форма */
-  .sf-check-form { flex-direction: column; width: 100%; gap: 10px; }
-  .sf-check-form input, .sf-check-form button { width: 100%; box-sizing: border-box; }
+    .sf-check-form { 
+    flex-direction: column; 
+    width: 100%; 
+    gap: 10px; 
+  }
+  .sf-check-form input, 
+  .sf-check-form button { 
+    width: 100%; 
+    box-sizing: border-box; 
+    height: 50px; /* Делаем поля повыше */
+  }
 
   /* Подсказка */
   .sf-hint-container { flex-direction: column; align-items: stretch; padding: 15px; width: 100%; box-sizing: border-box; }
@@ -357,7 +373,16 @@ button { cursor: pointer; }
 
   /* Кафе */
   .sf-filter-bar { flex-direction: column; align-items: stretch; gap: 10px; }
-  .sf-filter-select { width: 100%; justify-content: space-between; }
+    .sf-filter-select { 
+    width: 100%; 
+    justify-content: flex-start; /* Прижимаем влево */
+    gap: 10px;
+    padding: 12px 16px;
+  }
+  .sf-filter-select select {
+    flex: 1;
+    text-align: left;
+  }
   .sf-filter-count { margin-left: 0; text-align: right; }
   .sf-cafes-grid-new { grid-template-columns: 1fr; }
   .sf-cafe-new-card { width: 100%; box-sizing: border-box; }
