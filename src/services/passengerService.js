@@ -1,22 +1,25 @@
 const MOCK_DATA = {
-  '555-1234567890': {
-    passengerName: 'Иванов Иван Иванович',
+  // Активный ваучер
+  'BP-1001-01': {
+    passengerName: 'Александр Иванов',
     voucherType: 'MEAL',
     totalAmount: 1000,
     balance: 750,
     status: 'Активен',
     currency: 'RUB',
   },
-  '555-0000000001': {
-    passengerName: 'Петров Петр Петрович',
+  // Билет найден, ваучер не выдан
+  'BP-1001-02': {
+    passengerName: 'Мария Петрова',
     voucherType: 'WATER',
     totalAmount: 0,
     balance: 0,
     status: 'Не выдан',
     currency: 'RUB',
   },
-  '555-9999999999': {
-    passengerName: 'Сидоров Сидор Сидорович',
+  // Ваучер закрыт
+  'BP-1001-03': {
+    passengerName: 'Дмитрий Смирнов',
     voucherType: 'MEAL',
     totalAmount: 1000,
     balance: 0,

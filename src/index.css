@@ -247,9 +247,25 @@ button { cursor: pointer; }
   .sf-info-section, .sf-how-section { width: 100% !important; margin: 15px 0 !important; padding: 20px !important; border-radius: 0 !important; box-sizing: border-box; }
 
   /* Форма */
-  .sf-check-form { flex-direction: column; width: 100%; gap: 10px; }
-  .sf-check-form input, .sf-check-form button { width: 100%; box-sizing: border-box; }
-
+   /* Форма */
+  .sf-check-form { 
+    flex-direction: column; 
+    width: 100%; 
+    gap: 10px; 
+  }
+  
+  .sf-check-form input { 
+    width: 100% !important; 
+    max-width: 100% !important;
+    box-sizing: border-box !important; 
+    flex: none !important; /* Убираем flex-растягивание */
+  }
+  
+  .sf-check-form button { 
+    width: 100% !important; 
+    max-width: 100% !important;
+    box-sizing: border-box !important; 
+  }
   /* Подсказка */
   .sf-hint-container { flex-direction: column; align-items: stretch; padding: 15px; width: 100%; box-sizing: border-box; }
   .sf-hint-left { flex-direction: column; align-items: flex-start; gap: 15px; width: 100%; }
@@ -261,11 +277,25 @@ button { cursor: pointer; }
   .sf-types { grid-template-columns: 1fr; gap: 15px; }
 
   /* Кафе */
-  .sf-filter-bar { flex-direction: column; align-items: stretch; gap: 10px; }
-  .sf-filter-select { width: 100%; justify-content: space-between; }
-  .sf-filter-count { margin-left: 0; text-align: right; }
-  .sf-cafes-grid-new { grid-template-columns: 1fr; }
-  .sf-cafe-new-card { width: 100%; box-sizing: border-box; }
+    /* Фильтр городов */
+  .sf-filter-bar {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 10px;
+  }
+  
+  .sf-filter-select {
+    width: 100% !important;
+    box-sizing: border-box !important;
+    justify-content: space-between; /* Раздвигаем иконку и стрелочку по краям */
+    display: flex;
+    align-items: center;
+  }
+  
+  .sf-filter-select select {
+    flex: 1; /* Селект занимает всё свободное место */
+    text-align: left; /* Текст прижат влево */
+  }
 
   /* Контакты и футер */
   .sf-contacts-grid { grid-template-columns: 1fr; gap: 15px; }

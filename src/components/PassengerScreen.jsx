@@ -109,7 +109,7 @@ export default function PassengerScreen() {
             </div>
 
             <form onSubmit={handleCheck} className="sf-check-form">
-<input type="text" value={ticket} onChange={(e) => setTicket(e.target.value)} placeholder="Номер билета (13 цифр)" />
+<input type="text" value={ticket} onChange={(e) => setTicket(e.target.value)} placeholder="Код посадочного талона" />
               <button type="submit" disabled={loading}>{loading ? 'Проверяем...' : 'Проверить'}</button>
             </form>
             
@@ -164,21 +164,21 @@ export default function PassengerScreen() {
                 </div>
                 
                 <div className="sf-hint-code">
-                  <span className="sf-hint-label">НОМЕР БИЛЕТА</span>
-                  <span className="sf-hint-value">555-1234567890</span>
+                  <span className="sf-hint-label">КОД ПОСАДОЧНОГО ТАЛОНА</span>
+                  <span className="sf-hint-value">BP-ХХХХ-ХХ</span>
                   <div className="sf-barcode"></div>
                 </div>
               </div>
 
               <div className="sf-hint-right">
-                <h4>Где найти номер?</h4>
-                <p>Введите 13-значный номер билета, указанный на вашем посадочном талоне или в электронном билете.</p>
-                <p className="sf-hint-example"><IconTicket /> Пример: 555-1234567890</p>
+                <h4>Где найти код?</h4>
+                <p>Введите код посадочного талона, указанный на вашем билете.</p>
+                <p className="sf-hint-example"><IconTicket /> Пример: BP-1001-01</p>
                 <div className="sf-test-codes">
-                  <strong>Тестовые номера:</strong>
-                  <span>555-1234567890 (активен)</span>
-                  <span>555-0000000001 (не выдан)</span>
-                  <span>555-9999999999 (закрыт)</span>
+                  <strong>Тестовые коды:</strong>
+                  <span>BP-1001-01 (активен)</span>
+                  <span>BP-1001-02 (не выдан)</span>
+                  <span>BP-1001-03 (закрыт)</span>
                 </div>
               </div>
             </div>
