@@ -45,6 +45,8 @@ export default function PassengerScreen() {
   const [error, setError] = useState('');
   const [selectedCity, setSelectedCity] = useState('Москва');
   const [selectedAirport, setSelectedAirport] = useState('SVO');
+  
+  // Состояние для мобильного меню
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   const handleCheck = async (e) => {
@@ -77,13 +79,32 @@ export default function PassengerScreen() {
   return (
     <div className="skyfood-page">
       <header className="sf-header">
-        <a href="#hero" className="sf-logo"><span className="sf-logo-icon">✈</span> <span>Sky<span style={{ color: 'var(--blue)' }}>Food</span></span></a>
+        <a href="#hero" className="sf-logo">
+          <span className="sf-logo-icon">✈</span> 
+          <span>Sky<span style={{ color: 'var(--blue)' }}>Food</span></span>
+        </a>
         
-        <button className="sf-burger" onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}>
-          ☰
+        {/* Десктопное меню */}
+        <nav className="sf-nav sf-nav-desktop">
+          <a href="#hero">Главная</a>
+          <a href="#how">Как работает</a>
+          <a href="#check-section">Проверить</a>
+          <a href="#cafes-list">Где воспользоваться</a>
+          <a href="#rules">Правила</a>
+          <a href="#contacts">Контакты</a>
+        </nav>
+
+        {/* Кнопка-бургер для мобильных */}
+        <button 
+          className="sf-burger" 
+          onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+          aria-label="Меню"
+        >
+          {isMobileMenuOpen ? '✕' : '☰'}
         </button>
 
-        <nav className={`sf-nav ${isMobileMenuOpen ? 'sf-nav-open' : ''}`}>
+        {/* Мобильное меню */}
+        <nav className={`sf-nav-mobile ${isMobileMenuOpen ? 'open' : ''}`}>
           <a href="#hero" onClick={() => setIsMobileMenuOpen(false)}>Главная</a>
           <a href="#how" onClick={() => setIsMobileMenuOpen(false)}>Как работает</a>
           <a href="#check-section" onClick={() => setIsMobileMenuOpen(false)}>Проверить</a>
@@ -94,8 +115,8 @@ export default function PassengerScreen() {
       </header>
 
       <main>
+        {/* HERO */}
         <section className="sf-hero" id="hero">
-            <section className="sf-hero sf-hero-mobile" id="hero"></section>
           <div className="sf-hero-image">
             <img src={coffeeImage} alt="Кофе и круассан" />
           </div>
@@ -113,19 +134,39 @@ export default function PassengerScreen() {
 
         <section className="sf-main-cards">
           <article className="sf-card sf-check-card" id="check-section">
-            <div className="sf-card-heading"><span className="sf-heading-icon"><IconSearch /></span><h2>Проверить ваучер</h2></div>
+            <div className="sf-card-heading">
+              <span className="sf-heading-icon"><IconSearch /></span>
+              <h2>Проверить ваучер</h2>
+            </div>
+
             <form onSubmit={handleCheck} className="sf-check-form">
-              <input type="text" value={ticket} onChange={(e) => setTicket(e.target.value)} placeholder="Код талона" />
+              <input 
+                type="text" 
+                value={ticket} 
+                onChange={(e) => {
+                  setTicket(e.target.value);
+                  if (e.target.value === '') { setData(null); setError(''); }
+                }} 
+                placeholder="Код талона" 
+              />
               <button type="submit" disabled={loading}>{loading ? 'Проверяем...' : 'Проверить'}</button>
             </form>
             
-            {error && <div className="sf-error-message"><h3>Посадочный талон не найден</h3><p>Проверьте правильность введённого кода или попробуйте отсканировать посадочный талон ещё раз.</p></div>}
+            {error && (
+              <div className="sf-error-message">
+                <h3>Посадочный талон не найден</h3>
+                <p>Проверьте правильность введённого кода или попробуйте отсканировать посадочный талон ещё раз.</p>
+              </div>
+            )}
             
             {data && (
               <>
                 {data.status === 'Активен' && (
                   <div className="sf-voucher-card">
-                    <div className="sf-voucher-header"><span>Ваш ваучер SkyFood</span><span className="sf-voucher-status">{data.status}</span></div>
+                    <div className="sf-voucher-header">
+                      <span>Ваш ваучер SkyFood</span>
+                      <span className="sf-voucher-status">{data.status}</span>
+                    </div>
                     <div className="sf-voucher-body">
                       <div className="sf-voucher-field"><span className="sf-field-label">Пассажир:</span><span className="sf-field-value">{data.passengerName}</span></div>
                       <div className="sf-voucher-field"><span className="sf-field-label">Тип ваучера:</span><span className="sf-field-value">{data.voucherType}</span></div>
@@ -141,11 +182,19 @@ export default function PassengerScreen() {
                     </div>
                   </div>
                 )}
+                
                 {data.status === 'Не выдан' && (
-                  <div className="sf-info-message"><h3>Ваучер пока недоступен</h3><p>По вашему посадочному талону пока нет доступного ваучера SkyFood. Если ваш рейс задержан, проверьте информацию позднее.</p></div>
+                  <div className="sf-info-message">
+                    <h3>Ваучер пока недоступен</h3>
+                    <p>По вашему посадочному талону пока нет доступного ваучера SkyFood. Если ваш рейс задержан, проверьте информацию позднее.</p>
+                  </div>
                 )}
+
                 {data.status === 'Закрыт' && (
-                  <div className="sf-error-message"><h3>Ваучер больше не действует</h3><p>Ваучер закрыт. Его использование для новых покупок недоступно.</p></div>
+                  <div className="sf-error-message">
+                    <h3>Ваучер больше не действует</h3>
+                    <p>Ваучер закрыт. Его использование для новых покупок недоступно.</p>
+                  </div>
                 )}
               </>
             )}
@@ -157,25 +206,30 @@ export default function PassengerScreen() {
                   <div className="sf-mt-route"><span>SVO</span> <span>→</span> <span>LED</span></div>
                   <div className="sf-mt-gate">GATE 12 · SEAT 18A</div>
                 </div>
+                
                 <div className="sf-hint-code">
                   <span className="sf-hint-label">КОД ТАЛОНА</span>
-                  <span className="sf-hint-value">BP-1001-01</span>
+                  <span className="sf-hint-value">TK-849201</span>
                   <div className="sf-barcode"></div>
                 </div>
               </div>
+
               <div className="sf-hint-right">
                 <h4>Где найти код?</h4>
-                <p>Введите 8 символов с талона — как в выделенной части образца.</p>
-                <p className="sf-hint-example"><IconTicket /> Пример: BP-1001-01 · латиницей</p>
+                <p>Введите 6 символов с талона — как в выделенной части образца.</p>
+                <p className="sf-hint-example"><IconTicket /> Пример: SF8K2P · латиницей</p>
                 <div className="sf-test-codes">
                   <strong>Тестовые коды (латиницей):</strong>
-                  <span>BP-1001-01 (активен)</span>
-                  <span>BP-1001-02 (не выдан)</span>
-                  <span>BP-1001-03 (закрыт)</span>
+                  <span>TK-849201 (активен)</span>
+                  <span>TK-000001 (не выдан)</span>
+                  <span>TK-999999 (закрыт)</span>
                 </div>
               </div>
             </div>
-            <div className="sf-bottom-note"><IconTicket /> Если ваучер выдан для вашего рейса, здесь появятся его условия и срок действия.</div>
+
+            <div className="sf-bottom-note">
+              <IconTicket /> Если ваучер выдан для вашего рейса, здесь появятся его условия и срок действия.
+            </div>
           </article>
 
           <article className="sf-card sf-types-card">
@@ -192,6 +246,7 @@ export default function PassengerScreen() {
           <div className="sf-section-label">ГДЕ ПОЛУЧИТЬ</div>
           <h2 className="sf-info-title">Где воспользоваться ваучером</h2>
           <p className="sf-info-subtitle">Выберите аэропорт и удобное кафе для вашей паузы.</p>
+          
           <div className="sf-filter-bar">
             <div className="sf-filter-select">
               <IconMapPin /> 
@@ -208,6 +263,7 @@ export default function PassengerScreen() {
             </div>
             <div className="sf-filter-count">{filteredCafes.length} кафе</div>
           </div>
+
           <div className="sf-cafes-grid-new">
             {filteredCafes.map(cafe => (
               <div key={cafe.id} className="sf-cafe-new-card">
@@ -225,6 +281,9 @@ export default function PassengerScreen() {
                 </div>
               </div>
             ))}
+          </div>
+          <div className="sf-info-footer" style={{ marginTop: '20px' }}>
+            ⓘ Кафе и расположение показаны для примера. Доступные точки будут указаны после проверки ваучера.
           </div>
         </section>
 
@@ -266,6 +325,7 @@ export default function PassengerScreen() {
             <div className="sf-contact-block"><IconMail /><div><strong>support@skyfood.example</strong><span>Для вопросов о ваучерах</span></div></div>
             <div className="sf-contact-block"><IconPhone /><div><strong>8 800 000-00-00</strong><span>Ежедневно · 08:00–22:00 МСК</span></div></div>
           </div>
+
           <div className="sf-footer-bar">
             <div className="sf-footer-left">© 2026 SkyFood. С заботой о пути.</div>
             <div className="sf-footer-right">
@@ -274,7 +334,10 @@ export default function PassengerScreen() {
               <span><IconHeart /> Забота в деталях</span>
             </div>
           </div>
-          <div className="sf-footer-legal">Иллюстративный макет сервиса. Контакты и заведения приведены в качестве примера; партнёрства с авиакомпаниями не заявляются.</div>
+          
+          <div className="sf-footer-legal">
+            Иллюстративный макет сервиса. Контакты и заведения приведены в качестве примера; партнёрства с авиакомпаниями не заявляются.
+          </div>
         </section>
       </main>
     </div>
