@@ -287,30 +287,24 @@ button { cursor: pointer; }
   .skyfood-page { padding: 0 !important; overflow-x: hidden; width: 100%; }
   body { overflow-x: hidden; }
 
-  /* Шапка с бургером */
-  .sf-header { padding: 15px 20px; flex-direction: row; justify-content: space-between; align-items: center; background: #fff; border-bottom: 1px solid #EAF3FF; }
+  /* ШАПКА (с бургером) */
+  .sf-header { padding: 15px 20px; display: flex; justify-content: space-between; align-items: center; background: #fff; border-bottom: 1px solid #EAF3FF; }
   .sf-logo { font-size: 22px; }
-  .sf-nav { display: none; } /* Скрываем ссылки */
-  
-  /* Добавляем иконку бургера (если её нет в коде, она появится через CSS) */
-  .sf-header::after {
-    content: '☰';
-    font-size: 28px;
-    color: var(--navy);
-    cursor: pointer;
-  }
+  .sf-nav { display: none; }
+  .sf-header::after { content: '☰'; font-size: 28px; color: var(--navy); cursor: pointer; }
 
-  /* ГЛАВНЫЙ ЭКРАН */
+  /* ГЛАВНЫЙ ЭКРАН (КАРТИНКА НА ВЕСЬ ЭКРАН) */
   .sf-hero {
     position: relative;
-    height: 500px;
+    height: 550px; /* Высота под экран телефона */
+    width: 100%;
     border-radius: 0;
     margin: 0;
     overflow: hidden;
   }
   .sf-hero-image {
     position: absolute;
-    inset: 0;
+    top: 0; left: 0; right: 0; bottom: 0;
     z-index: 1;
   }
   .sf-hero-image img {
@@ -319,86 +313,71 @@ button { cursor: pointer; }
     object-fit: cover;
     object-position: center;
   }
-  /* Градиент только для читаемости текста */
   .sf-hero-overlay {
     display: block;
     position: absolute;
-    inset: 0;
+    top: 0; left: 0; right: 0; bottom: 0;
     z-index: 2;
-    background: linear-gradient(180deg, rgba(255, 244, 232, 0.9) 0%, rgba(255, 244, 232, 0.4) 50%, transparent 100%);
+    background: linear-gradient(180deg, rgba(255, 244, 232, 0.9) 0%, rgba(255, 244, 232, 0.5) 50%, transparent 100%);
   }
-    .sf-hero-content {
+  .sf-hero-content {
     position: absolute;
     z-index: 3;
     padding: 40px 20px;
-    max-width: 100%;
-    /* Убираем растягивание на всю высоту */
-    height: auto; 
-    display: block; 
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    box-sizing: border-box;
   }
-  
-  .sf-hero h1 { font-size: 30px; line-height: 1.1; margin-bottom: 15px; }
+  .sf-hero h1 { font-size: 32px; line-height: 1.1; margin-bottom: 15px; }
   .sf-hero p { font-size: 14px; margin-bottom: 25px; }
   
-  /* Кнопка теперь идет сразу за текстом, а не прибита к низу */
+  /* Кнопка прижата к тексту */
   .sf-primary-button { 
     width: 100%; 
     max-width: 100%; 
-    margin-top: 0; /* Убираем отталкивание вниз */
+    margin-top: 10px; 
     margin-bottom: 0; 
   }
-  .sf-hero-note { display: none; }
 
-  /* Карточки */
-  .sf-main-cards { padding: 15px !important; margin-top: -20px !important; width: 100%; display: flex; flex-direction: column; gap: 15px; position: relative; z-index: 10; }
+  /* КАРТОЧКИ */
+  .sf-main-cards { padding: 15px !important; margin-top: -30px !important; width: 100%; display: flex; flex-direction: column; gap: 15px; position: relative; z-index: 10; box-sizing: border-box; }
   .sf-card { width: 100% !important; max-width: 100% !important; padding: 20px !important; margin: 0 !important; box-sizing: border-box; border-radius: 16px; }
   .sf-info-section, .sf-how-section { width: 100% !important; margin: 15px 0 !important; padding: 20px !important; border-radius: 0 !important; box-sizing: border-box; }
 
-  /* Форма */
-    .sf-check-form { 
-    flex-direction: column; 
-    width: 100%; 
-    gap: 10px; 
-  }
-  .sf-check-form input, 
-  .sf-check-form button { 
-    width: 100%; 
+  /* ФОРМА И ВВОД (УБИРАЕМ СЖАТИЕ) */
+  .sf-check-form { display: flex; flex-direction: column; width: 100%; gap: 10px; }
+  .sf-check-form input { 
+    width: 100% !important; 
     box-sizing: border-box; 
-    height: 50px; /* Делаем поля повыше */
+    height: 50px; 
+    flex: none; /* Отключаем сжатие */
+  }
+  .sf-check-form button { 
+    width: 100% !important; 
+    box-sizing: border-box; 
+    height: 50px; 
+    flex: none; 
   }
 
-  /* Подсказка */
+  /* ПОДСКАЗКА И ТИПЫ */
   .sf-hint-container { flex-direction: column; align-items: stretch; padding: 15px; width: 100%; box-sizing: border-box; }
   .sf-hint-left { flex-direction: column; align-items: flex-start; gap: 15px; width: 100%; }
   .sf-mini-ticket-ui { width: 100%; min-width: 0; box-sizing: border-box; }
   .sf-hint-code { align-items: flex-start; }
   .sf-hint-right { width: 100%; }
-
-  /* Типы ваучеров */
   .sf-types { grid-template-columns: 1fr; gap: 15px; }
 
-  /* Кафе */
+  /* КАФЕ И КОНТАКТЫ */
   .sf-filter-bar { flex-direction: column; align-items: stretch; gap: 10px; }
-    .sf-filter-select { 
-    width: 100%; 
-    justify-content: flex-start; /* Прижимаем влево */
-    gap: 10px;
-    padding: 12px 16px;
-  }
-  .sf-filter-select select {
-    flex: 1;
-    text-align: left;
-  }
+  .sf-filter-select { width: 100%; justify-content: space-between; }
   .sf-filter-count { margin-left: 0; text-align: right; }
   .sf-cafes-grid-new { grid-template-columns: 1fr; }
   .sf-cafe-new-card { width: 100%; box-sizing: border-box; }
-
-  /* Контакты и футер */
   .sf-contacts-grid { grid-template-columns: 1fr; gap: 15px; }
   .sf-footer-bar { flex-direction: column; gap: 15px; text-align: center; padding: 15px; }
   .sf-footer-right { flex-direction: column; gap: 10px; }
-
-  /* Правила */
   .sf-info-grid { grid-template-columns: 1fr; }
 }
 .sf-hero-overlay {
