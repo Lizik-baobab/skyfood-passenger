@@ -209,20 +209,20 @@ export default function PassengerScreen() {
                 
                 <div className="sf-hint-code">
                   <span className="sf-hint-label">КОД ТАЛОНА</span>
-                  <span className="sf-hint-value">TK-849201</span>
+                  <span className="sf-hint-value">BP-XXXX-XX</span>
                   <div className="sf-barcode"></div>
                 </div>
               </div>
 
               <div className="sf-hint-right">
                 <h4>Где найти код?</h4>
-                <p>Введите 6 символов с талона — как в выделенной части образца.</p>
-                <p className="sf-hint-example"><IconTicket /> Пример: SF8K2P · латиницей</p>
+                <p>Введите 8 символов с талона — как в выделенной части образца.</p>
+                <p className="sf-hint-example"><IconTicket /> Пример: BP-1001-01 · латиницей</p>
                 <div className="sf-test-codes">
                   <strong>Тестовые коды (латиницей):</strong>
-                  <span>TK-849201 (активен)</span>
-                  <span>TK-000001 (не выдан)</span>
-                  <span>TK-999999 (закрыт)</span>
+                  <span>BP-1001-01 (активен)</span>
+                  <span>BP-1001-02 (не выдан)</span>
+                  <span>BP-1001-03 (закрыт)</span>
                 </div>
               </div>
             </div>
