@@ -443,7 +443,7 @@ export default function PassengerScreen() {
                 </article>
               ))}
             </div>
-            <div className="sf-info-strip"><Icon name="info" size={15} /> Кафе и расположение показаны для примера. Доступные точки будут указаны после проверки ваучера.</div>
+        
           </section>
 
           <section className="sf-how-section" id="how">
