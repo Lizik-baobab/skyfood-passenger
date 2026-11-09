@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { checkTicket } from '../services/passengerService';
+import { getCafes } from '../services/cafeService';
 
 import coffeeImage from '../assets/coffee.png';
 import cafeAerocafeImage from '../assets/cafe-aerocafe.png';
@@ -50,17 +51,19 @@ const CITIES = [
   { name: 'Санкт-Петербург', airports: [{ code: 'LED', name: 'Пулково' }] },
 ];
 
-const CAFES = [
-  { id: 1, name: 'АэроКафе', airport: 'SVO', terminal: 'B', zone: 'После досмотра · у выхода 12', category: 'Кофе и выпечка', image: cafeAerocafeImage },
-  { id: 2, name: 'Coffee Point', airport: 'SVO', terminal: 'C', zone: 'Общая зона · уровень вылета', category: 'Сэндвичи и перекусы', image: cafeCoffeePointImage },
-  { id: 3, name: 'Terminal Bistro', airport: 'SVO', terminal: 'D', zone: 'После досмотра · у выхода 18', category: 'Горячие блюда', image: cafeTerminalBistroImage },
-  { id: 4, name: 'Волга Кафе', airport: 'KZN', terminal: '1', zone: 'Центральная зона', category: 'Национальная кухня', image: cafeVolgaImage },
-  { id: 5, name: 'Coffee House', airport: 'KZN', terminal: '1', zone: 'Зона прилёта', category: 'Кофе и десерты', image: cafeHouseImage },
-  { id: 6, name: 'Airport Food', airport: 'KZN', terminal: '1', zone: 'Зона вылета', category: 'Фастфуд', image: cafeAirportFoodImage },
-  { id: 7, name: 'Пулково Кафе', airport: 'LED', terminal: '1', zone: 'После досмотра', category: 'Завтраки', image: cafePulkovoImage },
-  { id: 8, name: 'Coffee Point', airport: 'LED', terminal: '1', zone: 'Зона прилёта', category: 'Кофе с собой', image: cafePulkovoCoffeeImage },
-  { id: 9, name: 'Terminal Bistro', airport: 'LED', terminal: '1', zone: 'Общая зона', category: 'Горячие блюда', image: cafePulkovoBistroImage },
-];
+
+const CAFE_IMAGES = {
+  1: cafeAerocafeImage,
+  2: cafeCoffeePointImage,
+  3: cafeTerminalBistroImage,
+  4: cafeVolgaImage,
+  5: cafeHouseImage,
+  6: cafeAirportFoodImage,
+  7: cafePulkovoImage,
+  8: cafePulkovoCoffeeImage,
+  9: cafePulkovoBistroImage
+};
+
 
 const RULES = [
   { icon: 'plane', title: 'При каких условиях предоставляется', text: 'Ваучер предоставляется пассажирам при задержке рейса, если авиакомпания участвует в программе SkyFood.' },
@@ -129,11 +132,16 @@ export default function PassengerScreen() {
   const [selectedCity, setSelectedCity] = useState('Москва');
   const [selectedAirport, setSelectedAirport] = useState('SVO');
   const [menuOpen, setMenuOpen] = useState(false);
+  const [cafes, setCafes] = useState([]);
+  const [cafesLoading, setCafesLoading] = useState(true);
+  const [cafesError, setCafesError] = useState('');
   const requestIdRef = useRef(0);
 
   const currentCity = CITIES.find(city => city.name === selectedCity);
   const availableAirports = currentCity ? currentCity.airports : [];
-  const filteredCafes = CAFES.filter(cafe => cafe.airport === selectedAirport);
+  const filteredCafes = cafes.filter(
+    cafe => cafe.airportCode === selectedAirport
+  );
 
   useEffect(() => {
     document.body.classList.toggle('sf-menu-is-open', menuOpen);
@@ -148,6 +156,36 @@ export default function PassengerScreen() {
     window.addEventListener('keydown', closeOnEscape);
     return () => window.removeEventListener('keydown', closeOnEscape);
   }, [menuOpen]);
+
+
+useEffect(() => {
+  let cancelled = false;
+
+  async function loadCafes() {
+    try {
+      const items = await getCafes();
+
+      if (!cancelled) {
+        setCafes(items);
+      }
+    } catch (error) {
+      if (!cancelled) {
+        setCafesError(error.message);
+      }
+    } finally {
+      if (!cancelled) {
+        setCafesLoading(false);
+      }
+    }
+  }
+
+  loadCafes();
+
+  return () => {
+    cancelled = true;
+  };
+}, []);
+
 
   const handleCityChange = event => {
     const cityName = event.target.value;
@@ -396,10 +434,16 @@ export default function PassengerScreen() {
                 </div>
               </div>
 
-              <div className="sf-test-codes">
-                <span>Попробуйте на примере:</span>
-                <div><code>BP-1001-01</code> — активен <b>·</b> <code>BP-1001-02</code> — не выдан <b>·</b> <code>BP-1001-03</code> — закрыт</div>
-              </div>
+
+<div className="sf-test-codes">
+  <span>Тестовые коды локальной базы:</span>
+  <div>
+    <code>BP-1001-01</code> — WATER, 150 ₽
+    {' · '}
+    <code>BP-1008-01</code> — MEAL, 900 ₽
+  </div>
+</div>
+
               <p className="sf-check-footnote">Уточните использование ваучера перед покупкой непосредственно в кафе.</p>
             </article>
 
@@ -428,21 +472,57 @@ export default function PassengerScreen() {
                   <button type="button" key={airport.code} className={selectedAirport === airport.code ? 'is-selected' : ''} onClick={() => setSelectedAirport(airport.code)}>{airport.code}</button>
                 ))}
               </div>
-              <span className="sf-cafe-count">{filteredCafes.length} кафе</span>
+              <span className="sf-cafe-count">
+                {cafesLoading ? 'Загрузка...' : `${filteredCafes.length} кафе`}
+              </span>
             </div>
 
-            <div className="sf-cafes-grid">
-              {filteredCafes.map(cafe => (
-                <article className="sf-cafe-card" key={cafe.id}>
-                  <div className="sf-cafe-image"><img src={cafe.image} alt={`Фото кафе ${cafe.name}`} /><span>{cafe.category}</span></div>
-                  <div className="sf-cafe-info">
-                    <div className="sf-cafe-title-row"><h3>{cafe.name}</h3><a href="#rules" aria-label={`Как воспользоваться ваучером в кафе ${cafe.name}`}><Icon name="external" size={16} /></a></div>
-                    <p className="sf-cafe-terminal">{cafe.airport} · Терминал {cafe.terminal}</p>
-                    <p className="sf-cafe-zone"><Icon name="pin" size={12} /> {cafe.zone}</p>
-                  </div>
-                </article>
-              ))}
-            </div>
+
+{cafesError && (
+  <p role="alert">{cafesError}</p>
+)}
+
+{cafesLoading && (
+  <p role="status">Загрузка кафе...</p>
+)}
+
+{!cafesLoading && !cafesError &&
+  filteredCafes.length === 0 && (
+    <p>В выбранном аэропорту кафе не найдены.</p>
+)}
+
+<div className="sf-cafes-grid">
+  {filteredCafes.map(cafe => (
+    <article className="sf-cafe-card" key={cafe.cafeId}>
+      <div className="sf-cafe-image">
+        <img
+          src={CAFE_IMAGES[cafe.cafeId] ?? coffeeImage}
+          alt={`Фото кафе ${cafe.cafeName}`}
+        />
+        <span>Кафе аэропорта</span>
+      </div>
+
+      <div className="sf-cafe-info">
+        <div className="sf-cafe-title-row">
+          <h3>{cafe.cafeName}</h3>
+          <a href="#rules" aria-label={`Как воспользоваться ваучером в кафе ${cafe.cafeName}`}>
+            <Icon name="external" size={16} />
+          </a>
+        </div>
+
+        <p className="sf-cafe-terminal">
+          {cafe.airportCode} · Терминал {cafe.terminal}
+        </p>
+
+        <p className="sf-cafe-zone">
+          <Icon name="pin" size={12} />
+          Этаж {cafe.floor ?? '—'} · сектор {cafe.sector ?? '—'}
+        </p>
+      </div>
+    </article>
+  ))}
+</div>
+
         
           </section>
 
